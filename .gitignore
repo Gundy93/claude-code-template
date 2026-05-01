@@ -1,0 +1,21 @@
+# Template repository own ignores
+# (각 profile의 .gitignore는 profiles/*/.gitignore 참조)
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Claude Code / OMC runtime state (template 자체에서 발생하는 세션 파일)
+.claude/sessions/
+.claude/cache/
+.omc/
+
+# 임시 파일
+/tmp/
+*.tmp
