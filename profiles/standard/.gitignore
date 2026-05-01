@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Environment files (secrets)
+.env
+.env.local
+.env.*.local
+
+# Claude Code runtime state — config는 보존, 세션·캐시만 무시
+.claude/sessions/
+.claude/cache/
+.omc/
+
+# Project-specific build artifacts
+# (시작 시 언어·프레임워크별 패턴을 추가)
