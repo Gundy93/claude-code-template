@@ -1,6 +1,6 @@
 # Bootstrap Prompt — Standard Profile (8-Agent)
 
-> 사용법: 새 프로젝트 디렉토리에서 Claude Code의 Opus 4.7 / xhigh 세션을 열고, 아래 모든 내용을 첫 메시지로 그대로 붙여넣는다.
+> 사용법: 새 프로젝트 디렉토리에서 Claude Code의 Opus 4.8 / high 세션을 열고(어려운 부트스트랩만 xhigh), 아래 모든 내용을 첫 메시지로 그대로 붙여넣는다.
 > 핸드북 부록 A를 그대로 옮긴 것이며, 단일 진실의 원천은 `HANDBOOK.md`이다.
 
 
@@ -14,7 +14,7 @@
 
 - 마스터 세션 내에서 `/model` 교체 시 prompt cache가 모델별로 분리되어 무효화되며, 새 모델은 풀 입력을 다시 처리해야 한다. 따라서 마스터는 한 모델로 유지한다.
 - 서브에이전트는 독립된 컨텍스트 윈도우에서 실행되어 마스터 컨텍스트를 오염시키지 않는다.
-- 모델별 비용 비율(2026년 4월 기준): Haiku 4.5 ($1/$5) : Sonnet 4.6 ($3/$15) : Opus 4.7 ($5/$25). Opus 4.7은 새 토크나이저로 같은 텍스트가 1.0~1.35배 토큰을 더 사용한다.
+- 모델별 비용 비율(2026년 5월 기준): Haiku 4.5 ($1/$5) : Sonnet 4.6 ($3/$15) : Opus 4.8 ($5/$25, 4.7과 동일). Opus 4.7 이후(4.8 포함)는 새 토크나이저로 같은 텍스트가 1.0~1.35배 토큰을 더 사용한다. Opus 4.8 기본 effort는 high(4.7은 xhigh). 모델 ID는 `claude-opus-4-8`.
 - 결정 권한 분배 원칙: 비가역·고난도 → Opus / 일상 실행 → Sonnet / 대량·단순 → Haiku.
 
 ## 3. 완료 기준 (Acceptance Criteria)
@@ -64,13 +64,14 @@ CLAUDE.md (없으면 생성, 있으면 시스템 관련 섹션 추가)
 name: architect
 description: Use PROACTIVELY for high-level design, architecture decisions, ADR drafting, API/schema design, and trade-off analysis on irreversible decisions. Read-only — does not modify code.
 model: opus
+effort: high
 tools: Read, Glob, Grep, WebSearch, WebFetch
 ```
 
 본문 필수 요소:
 - 역할: 비가역적 의사결정에 대한 깊은 추론과 구조화.
 - 출력 구조 — ① 의사결정 요약 ② 옵션 비교 (최소 2개) ③ 선택 근거 ④ 위험·전제 ⑤ 후속 액션.
-- 시작 시 "think carefully before responding"을 인지하고 충분히 사고할 것.
+- frontmatter에 `effort: high` 명시(Opus 4.8+에서 적용). 본문 백스톱 지시: "think at high effort by default; reserve deepest reasoning for irreversible/security-critical work."
 - 코드 수정 권한 없음(Edit/Write 도구 비포함). 분석·문서화 산출만 한다.
 
 ### 5.2 deep-debugger — `model: opus`
@@ -79,11 +80,13 @@ tools: Read, Glob, Grep, WebSearch, WebFetch
 name: deep-debugger
 description: Use for race conditions, concurrency bugs, memory issues, mysterious heisenbugs, and cross-module bugs that require deep multi-step reasoning. NOT for simple stack-trace debugging — use implementer for those.
 model: opus
+effort: high
 tools: Read, Grep, Glob, Bash, Edit
 ```
 
 본문 필수 요소:
 - 역할: 단순 스택트레이스로 잡히지 않는 깊은 버그 진단·수정.
+- frontmatter에 `effort: high` 명시(Opus 4.8+에서 적용). 어려우면 호출 시 xhigh.
 - 워크플로우 — 가설 수립 → 증거 수집 → 가설 검증 → 최소 수정.
 - 출력 구조 — ① 근본 원인 ② 증거 ③ 수정 패치 ④ 회귀 테스트 제안.
 - 가설이 3회 연속 실패하면 진행을 중단하고 보고할 것 (무한 추론 폭주 방지).
@@ -94,11 +97,13 @@ tools: Read, Grep, Glob, Bash, Edit
 name: pr-reviewer
 description: Use for security-sensitive, business-critical, or architecture-impacting code reviews. Focus on areas where missing a defect is costly. NOT for style/lint reviews — those belong to tooling.
 model: opus
+effort: xhigh
 tools: Read, Grep, Glob, Bash
 ```
 
 본문 필수 요소:
 - 역할: 놓치면 비용이 큰 영역(보안, 동시성, 데이터 정합성, 인터페이스 계약, 권한)에 집중.
+- frontmatter에 `effort: xhigh` 명시(Opus 4.8+에서 적용). 놓치면 비용이 큰 영역이라 한 단계 깊게.
 - 출력 구조 — ① 차단(blocker) 이슈 ② 강력 권고(should-fix) ③ 제안(nice-to-have) ④ 칭찬할 점.
 - 스타일·포맷팅 지적 금지 (도구 영역).
 - 코드 수정 금지 (읽기 전용).
@@ -229,11 +234,11 @@ CLAUDE.md (없으면 생성, 있으면 별도 섹션 "## Sub-agent Orchestration
 
 ## 10. effort
 
-이 작업은 xhigh로 진행한다. 다수 파일 생성·검증을 포함한 다단계 작업이며 후속 모든 개발 효율의 기반이 되므로 충분한 추론과 자체 점검이 필요하다.
+이 작업은 Opus 4.8 기본값인 high로 진행한다(2026년 5월 기준). 다수 파일 생성·검증을 포함한 다단계 작업이지만, 4.8 high가 4.7 xhigh와 비슷한 토큰으로 더 좋은 결과를 내므로 high로 충분하다. 대규모 기존 코드베이스·충돌 많은 `.claude/` 등 어려운 부트스트랩만 xhigh로 올린다.
 
 
 ---
 
 
 
-# 부트스트랩 버전: v0.1.0
+# 부트스트랩 버전: v0.2.0
