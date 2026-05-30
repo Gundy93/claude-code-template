@@ -4,7 +4,7 @@
 
 ## 마스터 세션의 절대 원칙
 
-- **`/model` 교체 금지**. 마스터는 한 모델(Opus 4.7 권장)을 유지한다. 모델 다양성은 서브에이전트의 `model` 필드로 표현한다.
+- **`/model` 교체 금지**. 마스터는 한 모델(Opus 4.8 권장)을 유지한다. 모델 다양성은 서브에이전트의 `model` 필드로 표현한다.
 - **마스터는 코드를 거의 짜지 않는다**. 마스터의 본업은 작업 분해·라우팅·결과 종합이다.
 - **이 CLAUDE.md를 자주 수정하지 않는다**. 캐시 친화 유지가 비용 절감의 핵심.
 
@@ -12,9 +12,9 @@
 
 | 에이전트 | 모델 | 쓰기 권한 | 핵심 용도 |
 |---|---|---|---|
-| architect | opus | × | 아키텍처·ADR·API 설계 (비가역 결정) |
-| deep-debugger | opus | ✓ | race·메모리·heisenbug |
-| pr-reviewer | opus | × | 보안·핵심 PR 리뷰 |
+| architect | opus (effort high) | × | 아키텍처·ADR·API 설계 (비가역 결정) |
+| deep-debugger | opus (effort high) | ✓ | race·메모리·heisenbug |
+| pr-reviewer | opus (effort xhigh) | × | 보안·핵심 PR 리뷰 |
 | implementer | sonnet | ✓ | 명세 명확한 기능 구현 |
 | refactorer | sonnet | ✓ | 동작 보존 리팩토링 |
 | test-writer | sonnet | ✓ | 테스트 작성 |
@@ -45,7 +45,7 @@
 관련 파일: [경로 목록 또는 "explorer로 먼저 확인"]
 ```
 
-이 4요소가 빠지면 결과 품질이 즉각 떨어진다. Opus 4.7은 명령을 문자 그대로 따르므로 모호한 명세 = 좁은 결과.
+이 4요소가 빠지면 결과 품질이 즉각 떨어진다. Opus는 명령을 문자 그대로 따르므로 모호한 명세 = 좁은 결과.
 
 ## 검증 강도 라우팅 (이슈 분해 시)
 
@@ -83,4 +83,4 @@
 
 ---
 
-> 템플릿 v0.1.0 기반.
+> 템플릿 v0.2.0 기반.
