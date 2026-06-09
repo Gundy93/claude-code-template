@@ -30,7 +30,7 @@ switching `/model` inside the master (which would split and invalidate the promp
 - **`HANDBOOK.md`** — the single source of truth: why the master/sub-agent split works, a
   cost-efficiency matrix by task type, the 8-agent blueprint, daily workflows, cost levers, and
   pitfalls.
-- **`docs/`** — profile-selection criteria, bootstrap prompts, and a maintenance guide.
+- **`docs/`** — [profile-selection criteria](docs/profile-selection.md), [bootstrap prompts](docs/bootstrap-prompts/), and a [maintenance guide](docs/maintenance-guide.md).
 
 ## Quick start
 
@@ -68,4 +68,4 @@ For the current template version and the latest model/pricing details, see the
 
 ## License
 
-This template was written for personal use. Fork and modify freely.
+Originally written for personal use, and shared freely — fork and modify as you like.
