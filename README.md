@@ -1,3 +1,5 @@
+**[English](README.en.md)** | 한국어
+
 # claude-code-template
 
 Claude Code 프로젝트의 시작점. 신규 프로젝트는 이 템플릿에서 프로필을 골라 복사해 시작한다.
