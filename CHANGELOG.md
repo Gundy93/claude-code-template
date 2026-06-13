@@ -10,9 +10,11 @@
 
 ### Added — 추가
 - **영어 진입점 (i18n)**: 공유를 위해 `README.en.md`(한 화면 분량 영어 개요)를 추가하고 `README.md` 상단에 `[English] | 한국어` 언어 전환 링크를 둠. 한국어 문서가 canonical로 유지되며, 영어판에는 버전·가격·모델명을 넣지 않아 모델 사이클마다 갱신할 필요가 없다(per-cycle churn 0). `HANDBOOK.md`·`docs/`·프로필·`shared/`는 변경하지 않음 — 라우팅 `description`이 이미 영어라 프로필은 그대로 동작.
-- **Fable 5 의사결정 가이드 (모델 레이어, 경량 추가)**: 2026-06-09 GA로 출시된 **Claude Fable 5**(`claude-fable-5`, $10/$50 = Opus 2×, Opus 위 새 티어)를 반영. `HANDBOOK.md` §5.4에 "상위 능력이 필요할 때 — Opus effort↑ vs Fable 5" 의사결정 블록 신설(핵심: **effort 먼저, 모델 나중** — Opus 천장에 막혔을 때만 Fable, 격리 서브에이전트·마스터·default로는 쓰지 않음). §3.1 모델 표에 Fable 행 1줄, §4.1에 effort·thinking 메모, §5.1 매트릭스 메모에 "어떤 행도 Fable로 치환 안 됨" 한 줄. **어떤 default도 바꾸지 않음** — 마스터·8개 에이전트의 `model` 별칭과 3원칙 불변, 에이전트 파일·버전 스탬프 무변경. *(default·assignment 무변경 + 접근/요금 정책 유동 → 단독 bump 없이 다음 minor에 묶음; 유동 정책은 표준 API가 $10/$50만 기준)*
 
-> 위 두 항목은 모델 default·가격·effort 배정·에이전트 변경이 아니라 문서 추가·의사결정 가이드이므로 단독 버전 bump 없이 다음 minor에 묶는다(유지관리 가이드 §5 "단독 bump 안 함" 정책).
+> 이 항목은 모델·가격·effort·에이전트 변경이 아니라 문서 추가이므로 단독 버전 bump 없이 다음 minor에 묶는다(유지관리 가이드 §5 "단독 bump 안 함" 정책).
+
+### Removed — 제거
+- **Fable 5 의사결정 가이드 (철회)**: 이전 `[Unreleased]` 초안에 경량 추가했던 Fable 5(`claude-fable-5`, Opus 위 티어) 의사결정 가이드를 철회. 2026-06 미국 정부의 접근 제한으로 사용 불가가 되어 정식 반영 전 되돌렸다 — `HANDBOOK.md` §3.1·§4.1·§5.1·§5.4 및 `docs/maintenance-guide.md` T1 메모를 pre-Fable 상태로 원복. 정식 릴리즈에 포함된 적이 없어 버전 bump 없음.
 
 ---
 

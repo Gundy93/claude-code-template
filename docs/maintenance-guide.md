@@ -38,8 +38,6 @@
 - best-practices 글이 **draft·preview** 상태
 - 단순 typo 수정 — 다음 minor에 묶어 처리
 
-> **T1의 범위 메모(Fable 5 계기, 2026-06)**: T1은 *같은 family의 후속 모델*(Opus→Opus)을 가정한다. **기존 family 위의 새 티어**(예: Opus 위 **Fable 5** — GA지만 `opus/sonnet/haiku` 별칭·에이전트·effort 배정 중 어느 것도 안 바꿈)는 이 표의 빈틈이다. 이때는 모델 별칭·에이전트 파일·버전 스탬프를 건드리지 말고, "상위 능력이 필요할 때 어느 레버를 쓰나(Opus effort↑ vs 상위 모델)"의 *의사결정 가이드*로만 경량 추가한다(HANDBOOK §5.4). default를 바꾸는 같은-family 후속(T1)과 달리 **관망해도 잃는 효율이 0**이므로 cadence도 느슨해도 된다.
-
 ---
 
 ## 2. Cadence (언제 업데이트하는가)
