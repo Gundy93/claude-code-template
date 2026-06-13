@@ -13,7 +13,8 @@
 
 > 이 항목은 모델·가격·effort·에이전트 변경이 아니라 문서 추가이므로 단독 버전 bump 없이 다음 minor에 묶는다(유지관리 가이드 §5 "단독 bump 안 함" 정책).
 
-> **철회 메모(2026-06)**: 이전 `[Unreleased]` 초안의 **Fable 5 의사결정 가이드**는 2026-06 미국 정부의 접근 제한으로 사용 불가가 되어 정식 반영 전 철회했다 — `HANDBOOK.md` §3.1·§4.1·§5.1·§5.4 및 `docs/maintenance-guide.md` T1 메모 원복.
+### Removed — 제거
+- **Fable 5 의사결정 가이드 (철회)**: 이전 `[Unreleased]` 초안에 경량 추가했던 Fable 5(`claude-fable-5`, Opus 위 티어) 의사결정 가이드를 철회. 2026-06 미국 정부의 접근 제한으로 사용 불가가 되어 정식 반영 전 되돌렸다 — `HANDBOOK.md` §3.1·§4.1·§5.1·§5.4 및 `docs/maintenance-guide.md` T1 메모를 pre-Fable 상태로 원복. 정식 릴리즈에 포함된 적이 없어 버전 bump 없음.
 
 ---
 
