@@ -744,7 +744,7 @@ explorer가 원시 grep 출력을 토해내면 컨텍스트 부풀림 회피의 
 
 또한 토큰 절감 자체를 목적으로 하는 MCP도 있다. 대형 코드베이스에서 §11.7·§11.8을 자동화하고 싶을 때 후보 (2026년 6월 기준, 외부 의존성·비용 주의):
 
-- **Code Review Graph** (`tirth8205/code-review-graph`): Tree-sitter로 변경 영향 범위(blast radius)만 추려 컨텍스트에 넣는다. 검증된 벤치마크(중앙값 ~82×). MCP·CLI 제공.
+- **Code Review Graph** (`tirth8205/code-review-graph`): Tree-sitter로 변경 영향 범위(blast radius)만 추려 컨텍스트에 넣는다. 저자 보고 벤치마크(중앙값 ~82× 토큰 절감, 핀된 SHA 기반 재현 절차 공개). MCP·CLI 제공.
 - **Context Mode** (`mksglu/context-mode`): 대용량 도구 출력을 SQLite에 색인하고 추출분만 반환 — §11.7의 자동화판.
 - **Claude Context** (`zilliztech/claude-context`): 하이브리드 시맨틱 검색. 단 Milvus/Zilliz + 임베딩 API 의존(추가 인프라·비용)이라 매우 큰 코드베이스에서만 검토.
 
