@@ -4,15 +4,15 @@
 
 Claude Code 프로젝트의 시작점. 신규 프로젝트는 이 템플릿에서 프로필을 골라 복사해 시작한다.
 
-**현재 버전**: v0.2.0
+**현재 버전**: v0.3.0
 
-## 📌 최근 업데이트 (v0.2.0 — 2026년 5월, Claude Opus 4.8)
+## 📌 최근 업데이트 (v0.3.0 — 2026년 6월, 토큰 절감 레퍼런스 검토 반영)
 
-- 마스터·Opus 에이전트 **Opus 4.7 → 4.8** (표준 가격 불변 $5/$25).
-- **effort 기본값 high**(4.7은 xhigh)에 맞춰 권장 effort 한 단계 하향. 부트스트랩 세션: "Opus 4.7 / xhigh" → **"Opus 4.8 / high"**.
-- 서브에이전트 **`effort` frontmatter 필드** 공식화 → Opus 에이전트에 채택(high·high·xhigh).
-- 신규 레버 **fast mode**·**dynamic workflows/`ultracode`** 편입, 배치 $2.50/$12.50.
-- 아키텍처·Sonnet/Haiku 배정·3원칙은 **불변**.
+- 외부 토큰 절감 레퍼런스 10종 검토 → **0-인프라 원리만** 핸드북에 흡수(나머지는 CHANGELOG에 미채택 근거 기록).
+- 신규 비용 레버 2종: **§11.7 도구·명령 출력 컴팩션**, **§11.8 컨텍스트 위생** ("비용 레버 여섯 가지" → "여덟 가지").
+- **§14.3에 토큰 절감 MCP 후보** 명시(Code Review Graph·Context Mode·Claude Context) — 무번들 원칙 유지, 환경 내장 LSP·ast_grep 우선.
+- 영어 진입점 `README.en.md`(i18n) 동봉.
+- 모델·effort·아키텍처는 **불변**(v0.2.0 Opus 4.8 레이어 유지).
 
 → 전체 이력: [`CHANGELOG.md`](CHANGELOG.md) · 배경·근거: [`HANDBOOK.md`](HANDBOOK.md) §3~5·§11
 
@@ -80,7 +80,7 @@ cd ~/development/new-project
 
 ## 버전 정책
 
-- VERSION 파일이 단일 진실의 원천 (현재 `v0.2.0`).
+- VERSION 파일이 단일 진실의 원천 (현재 `v0.3.0`).
 - 핸드북·프로필·부트스트랩 프롬프트가 같은 버전을 공유.
 - 큰 변경 시에만 마이너 증가, 호환성 깨질 때만 메이저 증가.
 - 핸드북 자체에 변경이 있으면 템플릿 버전도 함께 올린다.
@@ -96,7 +96,7 @@ claude-code-template/
 ├── README.md                    # 이 파일
 ├── CHANGELOG.md                 # 버전별 변경 이력
 ├── HANDBOOK.md                  # 핸드북 사본 (단일 진실의 원천)
-├── VERSION                      # v0.2.0
+├── VERSION                      # v0.3.0
 ├── docs/
 │   ├── profile-selection.md     # 경량 vs 표준 결정 기준
 │   └── bootstrap-prompts/
