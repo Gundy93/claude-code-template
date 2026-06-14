@@ -241,4 +241,4 @@ CLAUDE.md (없으면 생성, 있으면 별도 섹션 "## Sub-agent Orchestration
 
 
 
-# 부트스트랩 버전: v0.2.0
+# 부트스트랩 버전: v0.3.0
