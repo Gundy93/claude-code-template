@@ -4,15 +4,14 @@
 
 Claude Code 프로젝트의 시작점. 신규 프로젝트는 이 템플릿에서 프로필을 골라 복사해 시작한다.
 
-**현재 버전**: v0.3.0
+**현재 버전**: v0.4.0
 
-## 📌 최근 업데이트 (v0.3.0 — 2026년 6월, 토큰 절감 레퍼런스 검토 반영)
+## 📌 최근 업데이트 (v0.4.0 — 2026년 7월, Claude Sonnet 5 반영)
 
-- 외부 토큰 절감 레퍼런스 10종 검토 → **0-인프라 원리만** 핸드북에 흡수(나머지는 CHANGELOG에 미채택 근거 기록).
-- 신규 비용 레버 2종: **§11.7 도구·명령 출력 컴팩션**, **§11.8 컨텍스트 위생** ("비용 레버 여섯 가지" → "여덟 가지").
-- **§14.3에 토큰 절감 MCP 후보** 명시(Code Review Graph·Context Mode·Claude Context) — 무번들 원칙 유지, 환경 내장 LSP·ast_grep 우선.
-- 영어 진입점 `README.en.md`(i18n) 동봉.
-- 모델·effort·아키텍처는 **불변**(v0.2.0 Opus 4.8 레이어 유지).
+- **Sonnet 티어 자동 승격**: `model: sonnet` 별칭이 이제 Sonnet 5로 해석 → implementer·refactorer·test-writer·doc-writer가 파일 수정 없이 승격. 에이전트 성능이 Opus 4.8에 근접.
+- **가격**: Sonnet 5 표준 $3/$15, 2026-08-31까지 인트로 $2/$10.
+- **새 토크나이저·effort**: Sonnet 5는 4.6 대비 같은 텍스트가 ~30% 더 많은 토큰(§3.2). 적응형 추론 기본 ON·xhigh 지원(§4).
+- **Opus 티어·아키텍처는 불변**: architect·deep-debugger·pr-reviewer는 Opus 4.8 유지(비가역·보안·최고난도 추론). T1 모델 사이클.
 
 → 전체 이력: [`CHANGELOG.md`](CHANGELOG.md) · 배경·근거: [`HANDBOOK.md`](HANDBOOK.md) §3~5·§11
 
@@ -80,7 +79,7 @@ cd ~/development/new-project
 
 ## 버전 정책
 
-- VERSION 파일이 단일 진실의 원천 (현재 `v0.3.0`).
+- VERSION 파일이 단일 진실의 원천 (현재 `v0.4.0`).
 - 핸드북·프로필·부트스트랩 프롬프트가 같은 버전을 공유.
 - 큰 변경 시에만 마이너 증가, 호환성 깨질 때만 메이저 증가.
 - 핸드북 자체에 변경이 있으면 템플릿 버전도 함께 올린다.
@@ -96,7 +95,7 @@ claude-code-template/
 ├── README.md                    # 이 파일
 ├── CHANGELOG.md                 # 버전별 변경 이력
 ├── HANDBOOK.md                  # 핸드북 사본 (단일 진실의 원천)
-├── VERSION                      # v0.3.0
+├── VERSION                      # v0.4.0
 ├── docs/
 │   ├── profile-selection.md     # 경량 vs 표준 결정 기준
 │   └── bootstrap-prompts/

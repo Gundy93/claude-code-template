@@ -12,6 +12,38 @@
 
 ---
 
+## [v0.4.0] — 2026-07-01 — Claude Sonnet 5 반영
+
+2026-06-30 출시된 **Claude Sonnet 5**를 반영한 두 번째 모델 유지관리 사이클(T1). 아키텍처와 **Opus 티어는 그대로 두고**, Sonnet 티어의 모델·가격·토크나이저·effort 레이어만 갱신했다. `model: sonnet` 별칭이 Claude Code 기본값으로 Sonnet 5를 가리키므로 **에이전트 파일은 한 줄도 바뀌지 않았다**(family alias 자동 승격). 핵심은 모델명 치환이 아니라 **새 토크나이저(~30%)·적응형 추론 기본 ON·xhigh 지원 편입 + stale 사실 정정**이다.
+
+### Changed — 바뀜
+- **Sonnet 티어 이전**: `model: sonnet` 별칭 → **Sonnet 5**(Claude Code 기본값). implementer·refactorer·test-writer·doc-writer가 파일 수정 없이 자동 승격. Sonnet 4.6은 "직전 Sonnet"으로 재배치. 배정 티어(3원칙)는 불변.
+- **가격**: Sonnet 5 표준 **$3/$15**(4.6과 동일), 2026-08-31까지 **인트로 $2/$10**. 핸드북 §1.1·§3.1·§5·§11.5·부록 A와 부트스트랩 가격 줄 갱신.
+- **§3.2 토크나이저 일반화**: "새 토크나이저 = Opus 4.7+ 전용"에서 **"Opus 4.7 이후 + Sonnet 5"**로 확장. Sonnet 5는 4.6 대비 **~30% 토큰 증가**(공식 확인), Sonnet 4.6·Haiku 4.5는 구 토크나이저(무인플레). drop-in 교체지만 토큰 재계량·`max_tokens` 절단 주의 명시.
+
+### Added — 추가
+- **effort 표(§4.1)에 Sonnet 5**: low/medium/high/xhigh/max 지원 — **xhigh 신규 획득**(4.6은 미지원). 기본 effort **high**(공식 확인).
+- **적응형 추론(§4.4)에 Sonnet 5 편입**: Sonnet 5는 적응형 추론 **기본 ON**(4.6은 OFF), 수동 extended thinking 제거(400), 비기본 sampling 파라미터 400, Priority Tier 미지원 — Opus 4.8과 같은 계약.
+- **출처(부록 E)**: Sonnet 5 공식 문서 3종(What's new·소개·마이그레이션 가이드)과 토크나이저·effort 근거 줄 추가. 용어집(xhigh·적응형 추론·1M)에 Sonnet 5 반영.
+
+### Unchanged — 의도적으로 그대로 둔 것
+- **아키텍처 골격·Opus 티어**: architect·deep-debugger·pr-reviewer = Opus 4.8 유지(비가역·보안·최고난도 추론은 Anthropic도 Opus 우위로 명시). 마스터 Opus 4.8/high 유지, 8개 역할 분담·3원칙·위임 4요소 불변.
+- **에이전트 frontmatter**: `model` 별칭·Opus 3개의 `effort` 필드 무수정. effort 필드는 여전히 **Opus 에이전트에만** 부여(정책 유지 — Sonnet 에이전트는 기본값 사용).
+- **범위**: 전략 가이드 보강(Sonnet 마스터 비용 레버·에스컬레이션 기준·Opus 호출 비율 지표)과 Sonnet 에이전트 effort 필드 도입은 이번 사이클 제외.
+
+### Fixed — 정정
+- **§4.5 stale 사실**: "Sonnet·Haiku 에이전트에서는 effort가 무시된다"는 Sonnet 5부터 오류 → "Sonnet 5는 effort를 지원하나 본 템플릿은 기본값(적응형 추론 ON) 사용"으로 정정(정책은 유지, 사실만 수정).
+
+### Notes — 관찰 (미채택)
+- **Fable 5**: 공식 모델 개요에 `claude-fable-5`가 GA로 노출됨($10/$50, "가장 유능한 널리 공개된 모델"). v0.3.0에서 접근 제한으로 철회했던 상태와 상충하나, 이번 Sonnet 5 사이클 범위 밖 — 별도 사이클에서 접근성·비용·"Opus 위 티어" 배치를 재검토한다.
+
+### Maintenance — 유지관리
+- `VERSION` v0.3.0 → v0.4.0. 7개 버전 스탬프 정합(VERSION·HANDBOOK 첫 줄·README·부트스트랩 ×2·CLAUDE.md ×2). `scripts/sync.sh --check` → OK(`shared/` 무변경 — 별칭만 쓰므로 에이전트 원본 불변).
+- `docs/maintenance-guide.md`: **모델 사이클 표본 n=1 → n=2**로 갱신. §7에 "사이클 2 결과" 추가 — cadence "4주 이내" 2회 연속 준수 기록, "같은-family T1이 토크나이저·thinking 기본값 변화를 동반할 수 있다"는 새 관찰과 T1 체크리스트 항목 권고.
+- `README.en.md`: 버전·가격·모델명 미포함 정책으로 **무변경**(per-cycle churn 0).
+
+---
+
 ## [v0.3.0] — 2026-06-14 — 토큰 절감 레퍼런스 검토 반영 + 영어 진입점
 
 외부 토큰 절감 레퍼런스 10종을 검토해 **0-인프라로 채택 가능한 원리만** 핸드북에 흡수한 콘텐츠 사이클(트리거 T6/T7). 모델·effort·아키텍처는 v0.2.0(Opus 4.8) 그대로다.
