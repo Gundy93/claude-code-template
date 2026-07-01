@@ -1,4 +1,4 @@
-> 이 파일은 claude-code-template v0.3.0과 함께 번들된 핸드북 사본이다.
+> 이 파일은 claude-code-template v0.4.0과 함께 번들된 핸드북 사본이다.
 > 핸드북 자체에 변경이 있으면 템플릿 버전도 함께 올린다 (§3.6 정책).
 
 # Claude 서브에이전트 개발 핸드북
@@ -6,7 +6,7 @@
 > 마스터-서브에이전트 분업으로 가성비와 품질을 동시에 잡는 방법
 
 **작성 기준일**: 2026년 4월 (Claude Opus 4.7 출시 직후)
-**개정**: 2026년 5월 (Claude Opus 4.8 출시 반영 — 모델·effort 배정 레이어 갱신, 신기능 편입)
+**개정**: 2026년 5월 (Claude Opus 4.8 반영) · 2026년 7월 (Claude Sonnet 5 반영 — Sonnet 티어 모델·가격·토크나이저·effort 레이어 갱신, Opus 티어·아키텍처 불변)
 **대상 독자**: Claude Code로 실무 프로젝트를 운영하는 개발자
 **적용 범위**: 기술 스택 무관 — 신규/기존 프로젝트 모두
 
@@ -67,7 +67,7 @@
 
 ### 1.1 모든 걸 Opus로 돌리면 비싸다
 
-Opus 4.8은 강력하지만 비싸다. 입력 100만 토큰당 $5, 출력 100만 토큰당 $25(2026년 5월 기준, 4.7과 동일). 같은 작업을 Sonnet 4.6으로 돌리면 입출력 모두 40% 저렴하고, Haiku 4.5로 돌리면 5배 저렴하다.
+Opus 4.8은 강력하지만 비싸다. 입력 100만 토큰당 $5, 출력 100만 토큰당 $25(2026년 7월 기준, 4.7과 동일). 같은 작업을 Sonnet 5로 돌리면 입출력 모두 40% 저렴하고(표준 $3/$15, 2026-08-31까지 인트로 $2/$10), Haiku 4.5로 돌리면 5배 저렴하다.
 
 문제는 Opus의 강점이 모든 작업에서 의미 있게 발휘되지는 않는다는 점이다. 보일러플레이트 CRUD를 Opus로 짜든 Sonnet으로 짜든 결과는 거의 같다. 코드베이스를 grep하는 작업을 Opus에 맡기는 것은 명백한 낭비다. 작업의 난이도와 모델의 능력 사이에 정합성이 맞아야 비용이 정당화된다.
 
@@ -85,7 +85,7 @@ Opus 4.8은 강력하지만 비싸다. 입력 100만 토큰당 $5, 출력 100만
 
 핵심은 **prompt cache가 모델별로 분리된다는 점**이다. Opus 캐시와 Sonnet 캐시는 별개다. 마스터 세션에서 Opus로 작업하다가 Sonnet으로 바꾸면, Sonnet은 그 세션의 누적된 컨텍스트(시스템 프롬프트, CLAUDE.md, 그동안의 대화)를 처음부터 다시 처리해야 한다. 캐시 히트 시 표준 입력가의 10%로 끝났을 처리가 100%로 돌아간다.
 
-여기에 Opus 4.7 이후 세대(4.8 포함)는 토크나이저까지 새로워서, 같은 텍스트가 1.0~1.35배 토큰을 더 사용한다. Opus 4.8로 교체하면 캐시 미스 + 토큰 인플레이션이 동시에 발생한다.
+여기에 토크나이저까지 새로워진 세대 — Opus 4.7 이후(4.8 포함)와 **Sonnet 5** — 는 같은 텍스트가 더 많은 토큰을 만든다(Opus 4.7+ 최대 1.35×, Sonnet 5는 4.6 대비 약 1.3×). 예컨대 Sonnet 4.6 기반 세션을 Sonnet 5로 옮기면 캐시 미스 + 토큰 인플레이션이 동시에 발생한다(§3.2).
 
 장시간 마스터 세션에서 모델을 자주 바꾸는 워크플로우는 이 두 가지 비용이 누적되어 빠르게 비싸진다. 개발자의 직관 — "모델을 바꾸면 새로 읽는 비용이 든다" — 은 정확히 옳고, 그 비용은 계량 가능하다.
 
@@ -134,29 +134,34 @@ Anthropic의 멀티에이전트 리서치 시스템 사례에서 흥미로운 �
 
 ## 3장. 모델별 가격과 특성
 
-### 3.1 현재 세대 모델 (2026년 5월 기준)
+### 3.1 현재 세대 모델 (2026년 7월 기준)
 
 | 모델 | 입력 / 출력 ($/MTok) | 주요 특징 |
 |---|---|---|
 | Opus 4.8 | 5 / 25 | 최신 플래그십(2026-05-28 출시). 기본 effort **high**. 적응형 추론 효율↑, 툴 트리거 개선, 정직성↑(코드 결함을 그냥 넘기는 비율이 4.7 대비 약 4× 감소). xhigh/max 지원. 4.7과 같은 토크나이저. 1M 컨텍스트. |
 | Opus 4.7 | 5 / 25 | 직전 플래그십. xhigh effort 기본. 새 토크나이저(1.0~1.35× 토큰). 1M 컨텍스트. |
 | Opus 4.6 | 5 / 25 | high effort 기본. 1M 컨텍스트. |
-| Sonnet 4.6 | 3 / 15 | Opus 대비 40% 저렴. high effort 기본. 1M 컨텍스트. 대부분 작업의 디폴트. |
+| Sonnet 5 | 3 / 15 (인트로 2 / 10, 2026-08-31까지) | 최신 Sonnet(2026-06-30 출시), Claude Code 기본값. Opus 대비 40% 저렴. 기본 effort **high**. **적응형 추론 기본 ON**, xhigh 지원. **새 토크나이저(4.6 대비 ~30% 토큰↑)**. 1M 컨텍스트. 에이전트 성능이 Opus 4.8에 근접. 대부분 작업의 디폴트. |
+| Sonnet 4.6 | 3 / 15 | 직전 Sonnet. high effort 기본. 구 토크나이저(인플레이션 없음). 1M 컨텍스트. |
 | Haiku 4.5 | 1 / 5 | Opus 대비 5× 저렴. 200K 컨텍스트. 대량·단순·고속 작업에 적합. |
 
-마스터·에이전트가 쓰는 "Opus"는 이제 4.8을 가리킨다(`model: opus` 별칭을 Claude Code가 현재 기본값으로 해석). 4.7은 직전 플래그십으로 남는다.
+마스터·에이전트가 쓰는 "Opus"는 이제 4.8을 가리킨다(`model: opus` 별칭을 Claude Code가 현재 기본값으로 해석). 4.7은 직전 플래그십으로 남는다. 마찬가지로 `model: sonnet` 별칭은 이제 **Sonnet 5**로 해석된다(Claude Code 기본값). Sonnet 4.6은 직전 Sonnet으로 남는다 — 별칭을 쓰는 서브에이전트(implementer·refactorer·test-writer·doc-writer)는 파일 수정 없이 Sonnet 5로 자동 승격된다.
 
 출력은 모든 모델에서 입력 가격의 정확히 5배다. 이 비율이 일관되어 예산 추정이 단순해진다.
 
-### 3.2 토크나이저 인플레이션 (Opus 4.7 이후, 4.8 포함)
+### 3.2 토크나이저 인플레이션 (Opus 4.7 이후 + Sonnet 5)
 
-Opus 4.7이 새 토크나이저를 도입했고, **Opus 4.8도 같은 토크나이저를 그대로 쓴다**(2026년 5월 기준, Anthropic 공식 가격 문서가 "Opus 4.7 and later use a new tokenizer"로 명시). 표시 가격은 4.6과 같지만, 같은 텍스트를 토큰화할 때 1.0~1.35배(공식 표현: "최대 35% 더") 더 많은 토큰을 만든다. 평균적으로 코드 작업에서 약 1.08~1.15배, 시스템 프롬프트같이 토크나이저가 까다로워하는 텍스트에서 1.4배 가까이 늘어난 사례도 보고됐다.
+새 토크나이저를 쓰는 세대가 둘로 늘었다(2026년 7월 기준):
+- **Opus 4.7 이후(4.8 포함)**: Opus 4.7이 도입한 토크나이저를 4.8도 그대로 쓴다(Anthropic 공식 가격 문서: "Opus 4.7 and later use a new tokenizer"). 같은 텍스트가 1.0~1.35배(공식 표현: "최대 35% 더") 더 많은 토큰이 된다.
+- **Sonnet 5**: Sonnet 5도 새 토크나이저를 채택해, 같은 텍스트가 **Sonnet 4.6 대비 약 30% 더** 많은 토큰이 된다(공식 확인). 반면 **Sonnet 4.6·Haiku 4.5는 여전히 구 토크나이저**라 인플레이션이 없다.
 
-실용적 의미: 4.6에서 4.7로 옮길 때 같은 청구서가 나오지 않는다. 표시가는 동일해도 실제 비용은 10~30% 더 나올 수 있다. 마스터 모델 선택에서 이는 무시할 수 없는 변수다.
+표시 가격(토큰당)은 이전과 같지만, 같은 텍스트가 더 많은 토큰이 되므로 실제 청구액은 오른다. 평균적으로 코드 작업에서 약 1.08~1.15배, 시스템 프롬프트같이 토크나이저가 까다로워하는 텍스트에서 1.4배 가까이 늘어난 사례도 보고됐다.
+
+실용적 의미: **Sonnet 4.6 → Sonnet 5로 옮길 때도** 같은 청구서가 나오지 않는다(표준가는 동일 $3/$15인데 토큰 수가 ~30% 늘기 때문 — 다만 2026-08-31까지 인트로 $2/$10가 이를 일부 상쇄한다). drop-in 교체지만 토큰 예산을 다시 계량하고, 기대 출력 길이에 근접한 `max_tokens`는 절단될 수 있으니 재확인한다. 마스터·서브에이전트 모델 선택에서 이는 무시할 수 없는 변수다.
 
 ### 3.3 1M 컨텍스트의 의미
 
-Opus 4.8, Opus 4.7, Opus 4.6, Sonnet 4.6은 모두 1M 토큰 컨텍스트 윈도우를 표준 가격에 제공한다. 추가 요금 없이 거대 문서·전체 코드베이스를 한 번에 다룰 수 있다.
+Opus 4.8, Opus 4.7, Opus 4.6, Sonnet 5, Sonnet 4.6은 모두 1M 토큰 컨텍스트 윈도우를 표준 가격에 제공한다(Haiku 4.5는 200K). 추가 요금 없이 거대 문서·전체 코드베이스를 한 번에 다룰 수 있다. 단 Sonnet 5는 새 토크나이저로 토큰당 담기는 텍스트가 줄어, 같은 1M 창이 Sonnet 4.6보다 적은 분량의 텍스트를 담는다.
 
 다만 1M을 채워서 일하는 것이 권장 패턴은 아니다. 컨텍스트가 커질수록 매 턴의 입력 비용이 비례해 커지기 때문이다. 1M은 상한이지 목표가 아니다. 1M까지 쓸 수 있다는 것은 "큰 컨텍스트를 다뤄야 할 때 거부당하지 않는다"는 보장이지, "컨텍스트를 가득 채워라"는 지시가 아니다.
 
@@ -174,15 +179,15 @@ Haiku의 진짜 가치는 "자주, 많이, 빠르게" 호출되는 작업에 있
 
 ### 4.1 다섯 단계
 
-Opus 4.8·4.7·4.6, Sonnet 4.6은 effort 파라미터로 추론 깊이를 조절한다. 사용 가능한 레벨은 모델마다 다르다.
+Opus 4.8·4.7·4.6, Sonnet 5·4.6은 effort 파라미터로 추론 깊이를 조절한다. 사용 가능한 레벨은 모델마다 다르다.
 
 | effort | 의미 | 지원 모델 |
 |---|---|---|
-| low | 빠르고 저렴, 추론 최소 | Opus 4.8 / 4.7 / 4.6 / Sonnet 4.6 |
-| medium | 균형. 표준 코딩에 적합 | Opus 4.8 / 4.7 / 4.6 / Sonnet 4.6 |
-| high | 깊은 추론. **Opus 4.8의 디폴트** | Opus 4.8 / 4.7 / 4.6 / Sonnet 4.6 |
-| xhigh | high와 max 사이. **Opus 4.7의 디폴트** (API에선 "extra") | Opus 4.8 / 4.7 |
-| max | 최대 추론. 비용·지연 최고 | Opus 4.8 / 4.7 / 4.6 / Sonnet 4.6 |
+| low | 빠르고 저렴, 추론 최소 | Opus 4.8 / 4.7 / 4.6 / Sonnet 5 / 4.6 |
+| medium | 균형. 표준 코딩에 적합 | Opus 4.8 / 4.7 / 4.6 / Sonnet 5 / 4.6 |
+| high | 깊은 추론. **Opus 4.8·Sonnet 5의 디폴트** | Opus 4.8 / 4.7 / 4.6 / Sonnet 5 / 4.6 |
+| xhigh | high와 max 사이. **Opus 4.7의 디폴트** (API에선 "extra") | Opus 4.8 / 4.7 / **Sonnet 5** |
+| max | 최대 추론. 비용·지연 최고 | Opus 4.8 / 4.7 / 4.6 / Sonnet 5 / 4.6 |
 
 xhigh가 나오기 전, Opus 사용자는 high와 max 중 하나를 골라야 했다. high는 가끔 부족하고 max는 자주 과하다는 불만이 있어 그 사이가 4.7에서 디폴트로 들어왔다. **그러나 Opus 4.8은 기본값을 다시 high로 되돌렸다(2026년 5월 기준, claude.ai·Cowork·Claude Code·API 전 표면 공통).** 즉 **high = 4.8 디폴트, xhigh = 4.7 디폴트**다. 4.8은 같은 effort에서 4.7보다 효율이 좋아져, 무조건 xhigh를 박는 것은 대부분 토큰 낭비다.
 
@@ -202,9 +207,11 @@ xhigh가 나오기 전, Opus 사용자는 high와 max 중 하나를 골라야 �
 
 또 하나의 관찰: **컨텍스트 품질이 effort 레벨보다 결과 품질에 더 큰 영향을 준다.** 좋은 컨텍스트를 가진 low effort가 모호한 컨텍스트의 max effort보다 자주 더 나은 결과를 낸다. effort 다이얼을 올리기 전에 컨텍스트를 손보는 것이 우선이다.
 
-### 4.4 적응형 추론 (Opus 4.7 이후, 4.8에서 더 효율적)
+### 4.4 적응형 추론 (Opus 4.7 이후 + Sonnet 5)
 
-Opus 4.7 이후 세대는 고정 thinking budget 모드가 사라지고 적응형 추론(adaptive thinking)만 지원한다. 모델이 단계마다 추론 필요 여부를 스스로 판단해서, 단순 단계는 빠르게 통과하고 복잡 단계에서만 깊게 사고한다. 사용자는 effort 레벨로 그 적응성의 강도를 조절할 뿐이다.
+Opus 4.7 이후 세대와 **Sonnet 5**는 고정 thinking budget 모드가 사라지고 적응형 추론(adaptive thinking)만 지원한다. 모델이 단계마다 추론 필요 여부를 스스로 판단해서, 단순 단계는 빠르게 통과하고 복잡 단계에서만 깊게 사고한다. 사용자는 effort 레벨로 그 적응성의 강도를 조절할 뿐이다.
+
+**Sonnet 5의 동작 변화(2026-06-30)**: Sonnet 4.6은 thinking이 기본 OFF였으나 Sonnet 5는 적응형 추론이 **기본 ON**이다(끄려면 `thinking:{type:"disabled"}`). 수동 extended thinking(`budget_tokens`)은 제거되어 400 에러, 비기본 sampling 파라미터(temperature/top_p/top_k)도 400 — Opus 4.8과 같은 계약이다. Priority Tier는 Sonnet 5에서 미지원. 기본 ON이므로 thinking 토큰이 `max_tokens`에 포함된다는 점에 유의(§3.2 재계량 권고와 연결).
 
 **Opus 4.8은 이 판단이 더 정교해졌다(2026년 5월 기준).** 같은 effort에서 4.7보다 낭비 thinking 토큰이 줄어, 보통 더 빠르고 저렴하게 같은 high 실행을 끝낸다. 코딩에서 4.8의 기본 high는 4.7 기본값(xhigh)과 비슷한 토큰을 쓰면서 점수는 더 높다.
 
@@ -214,7 +221,7 @@ Opus 4.7 이후 세대는 고정 thinking budget 모드가 사라지고 적응�
 
 **상황이 바뀌었다.** Claude Code 공식 서브에이전트 문서가 frontmatter `effort` 필드를 정식 필드로 명시한다: "Effort level when this subagent is active. Overrides the session effort level. Default: inherits from session. Options: `low, medium, high, xhigh, max`; 사용 가능한 레벨은 모델에 따라 다름." 즉 `model` 필드처럼 `effort` 필드도 이제 공식 지원이며, 생략하면 세션 effort를 상속하고, 모델이 지원하지 않는 레벨은 무시된다. `model` 필드는 `claude-opus-4-8` 같은 전체 ID도 받는다.
 
-**이 템플릿의 채택**: Opus 에이전트에 한해 frontmatter에 `effort`를 명시한다 — `architect: high`, `deep-debugger: high`, `pr-reviewer: xhigh`(§5.1 매트릭스와 정합). 효과는 Opus 4.8+ 에서만 나타나며 Sonnet·Haiku 에이전트에서는 무시되므로 그쪽에는 넣지 않는다. 안전망으로 본문 시스템 프롬프트의 지시("think at high effort by default; reserve deepest reasoning for irreversible/security-critical work")도 함께 유지한다 — 필드를 지원하지 않는 구버전 환경이나 다른 모델로 폴백해도 추론 깊이 의도가 보존된다.
+**이 템플릿의 채택**: Opus 에이전트에 한해 frontmatter에 `effort`를 명시한다 — `architect: high`, `deep-debugger: high`, `pr-reviewer: xhigh`(§5.1 매트릭스와 정합). **참고(2026년 7월)**: Sonnet 5는 이제 effort 파라미터(및 xhigh)를 지원하므로 "Sonnet은 effort를 무시한다"는 더 이상 사실이 아니다. 그럼에도 본 템플릿은 Sonnet 에이전트를 **기본값(적응형 추론 기본 ON, 기본 effort high)** 그대로 두고, 필요할 때만 마스터가 호출 시 effort를 지정한다 — 일상 작업 대부분에 기본 high가 적합하고, 에이전트마다 effort를 고정하면 관리 표면만 늘기 때문이다(Haiku 4.5는 effort 미지원). 안전망으로 Opus 에이전트 본문의 시스템 프롬프트 지시("think at high effort by default; reserve deepest reasoning for irreversible/security-critical work")도 함께 유지한다 — 필드를 지원하지 않는 구버전 환경이나 다른 모델로 폴백해도 추론 깊이 의도가 보존된다.
 
 환경 변수 `CLAUDE_CODE_EFFORT_LEVEL`은 세션 전체에 글로벌 적용되므로 에이전트별 차등 effort에는 여전히 적합하지 않다 — 차등이 필요하면 위의 frontmatter `effort`를 쓴다.
 
@@ -229,26 +236,26 @@ Opus 4.7 이후 세대는 고정 thinking budget 모드가 사라지고 적응�
 | 단계·작업 | 권장 조합 | 이유 |
 |---|---|---|
 | 마스터 플래닝, 아키텍처 결정 | Opus 4.8 / high (중대 비가역 결정만 xhigh~max) | 비가역, 후속 비용 레버리지 큼 |
-| 이슈·태스크 분해 | Sonnet 4.6 / high | 구조적 사고 필요, 양이 많음 |
-| 기술 리서치·스파이크 | Sonnet 4.6 / medium~high | 웹·문서 위주, 깊은 추론 적음 |
-| 일반 기능 구현 (스펙 명확) | Sonnet 4.6 / medium | 표준 워크호스 |
-| 보일러플레이트, 단순 CRUD | Sonnet 4.6 / low 또는 Haiku 4.5 | 패턴 매칭으로 충분 |
-| 단순 버그 수정 (스택트레이스 명확) | Sonnet 4.6 / medium | 컨텍스트가 진단을 결정 |
+| 이슈·태스크 분해 | Sonnet 5 / high | 구조적 사고 필요, 양이 많음 |
+| 기술 리서치·스파이크 | Sonnet 5 / medium~high | 웹·문서 위주, 깊은 추론 적음 |
+| 일반 기능 구현 (스펙 명확) | Sonnet 5 / medium | 표준 워크호스 |
+| 보일러플레이트, 단순 CRUD | Sonnet 5 / low 또는 Haiku 4.5 | 패턴 매칭으로 충분 |
+| 단순 버그 수정 (스택트레이스 명확) | Sonnet 5 / medium | 컨텍스트가 진단을 결정 |
 | 복잡 버그 (race, 메모리, 동시성) | Opus 4.8 / high → 어려우면 xhigh | 깊은 추론 필요 |
-| 단일 파일 리팩토링 | Sonnet 4.6 / medium | 영향 범위 작음 |
+| 단일 파일 리팩토링 | Sonnet 5 / medium | 영향 범위 작음 |
 | 다중 파일·구조적 리팩토링 | Opus 4.8 / high (어려우면 xhigh) | 영향 범위 추론 필요 |
-| 일반 PR 리뷰 | Sonnet 4.6 / high | 빠른 회전, 합리적 정확도 |
+| 일반 PR 리뷰 | Sonnet 5 / high | 빠른 회전, 합리적 정확도 |
 | 보안·핵심 PR 리뷰 | Opus 4.8 / xhigh | 놓치면 비용 큰 영역 |
-| 단위 테스트 작성 | Sonnet 4.6 / medium | 패턴 따라쓰기 |
+| 단위 테스트 작성 | Sonnet 5 / medium | 패턴 따라쓰기 |
 | 테스트 전략·E2E 시나리오 | Opus 4.8 / high | 커버리지 사고 필요 |
-| 코드 주석, README 업데이트 | Sonnet 4.6 / low 또는 Haiku 4.5 | 단순 글쓰기 |
+| 코드 주석, README 업데이트 | Sonnet 5 / low 또는 Haiku 4.5 | 단순 글쓰기 |
 | API 명세, ADR | Opus 4.8 / high | 후일 참조될 핵심 문서 |
 | 코드베이스 탐색·검색 | Haiku 4.5 | 빈도 높음, 단순 작업 |
 | 문서·로그 추출·요약 | Haiku 4.5 | 대량·단순 |
 | 커밋 메시지·릴리즈 노트 | Haiku 4.5 | 짧은 글, 패턴 명확 |
-| 서브에이전트 (검색·추출) | Haiku 4.5 또는 Sonnet 4.6 / low | 격리된 단순 작업 |
+| 서브에이전트 (검색·추출) | Haiku 4.5 또는 Sonnet 5 / low | 격리된 단순 작업 |
 
-> **4.8 기준 메모(2026년 5월)**: Opus 행의 권장 effort를 4.7 대비 한 단계 낮췄다(예: 아키텍처 xhigh→high). 4.8은 같은 effort로 더 좋은 결과를 내므로 기본 high로 충분하고, xhigh~max는 중대 비가역·보안 결정에만 남긴다. Sonnet·Haiku 행과 아래 세 원칙은 그대로다 — "4.8/low가 Sonnet/high보다 싸면서 낫다"는 행은 없다(4.8은 토큰당 $5/$25 + 토크나이저 인플레이션, Sonnet은 $3/$15).
+> **모델 메모(2026년 7월)**: (Opus) 권장 effort는 4.7 대비 한 단계 낮춘 상태 그대로다 — 4.8은 같은 effort로 더 좋은 결과를 내므로 기본 high로 충분하고, xhigh~max는 중대 비가역·보안 결정에만 남긴다. (Sonnet) Sonnet 행은 이제 Sonnet 5다 — 별칭 자동 승격으로 에이전트 코딩·자율 실행 능력이 4.6보다 크게 올랐지만 배정 티어는 그대로 유지한다. 아래 세 원칙도 그대로다 — "Opus 4.8/low가 Sonnet 5/high보다 싸면서 낫다"는 행은 없다: Sonnet 5도 이제 새 토크나이저(~30%)를 쓰지만 여전히 표준 $3/$15로 Opus $5/$25보다 저렴하고(2026-08-31까지 인트로 $2/$10), 비가역·보안·최고난도 추론에서는 Opus 4.8이 여전히 우위다.
 
 ### 5.2 매트릭스 해석 원칙
 
@@ -269,10 +276,10 @@ Opus 4.7 이후 세대는 고정 thinking budget 모드가 사라지고 적응�
 | architect | Opus 4.8 | 마스터 플래닝, 아키텍처, ADR, API 명세 |
 | deep-debugger | Opus 4.8 | 복잡 버그, 동시성 |
 | pr-reviewer | Opus 4.8 | 보안·핵심 PR 리뷰 |
-| implementer | Sonnet 4.6 | 일반 기능 구현, 단순 버그 수정 |
-| refactorer | Sonnet 4.6 | 다중 파일·구조적 리팩토링 |
-| test-writer | Sonnet 4.6 | 단위·통합 테스트 |
-| doc-writer | Sonnet 4.6 | API 명세, README, 주석, ADR (architect의 결정을 문서화) |
+| implementer | Sonnet 5 | 일반 기능 구현, 단순 버그 수정 |
+| refactorer | Sonnet 5 | 다중 파일·구조적 리팩토링 |
+| test-writer | Sonnet 5 | 단위·통합 테스트 |
+| doc-writer | Sonnet 5 | API 명세, README, 주석, ADR (architect의 결정을 문서화) |
 | explorer | Haiku 4.5 | 코드베이스 탐색, 검색 |
 
 이슈·태스크 분해는 별도 에이전트로 두지 않고 마스터가 처리한다(라우팅·계획 수립이 마스터의 본업이므로). 보일러플레이트는 implementer가 low effort 분위기로 처리한다. 일반 PR 리뷰는 마스터가 가볍게 본다.
@@ -336,7 +343,7 @@ pr-reviewer도 architect와 마찬가지로 읽기 전용이다. 리뷰어가 �
 
 ### 6.5 implementer — 표준 작업의 디폴트 워크호스
 
-**모델**: Sonnet 4.6
+**모델**: Sonnet 5
 **도구**: Read, Edit, Write, Glob, Grep, Bash
 **용도**: 명세가 명확한 기능 구현, 단순 버그 수정.
 
@@ -348,7 +355,7 @@ implementer는 시작 시 explorer로 프로젝트의 코딩 관행을 파악하
 
 ### 6.6 refactorer — 동작 보존 변경의 전문가
 
-**모델**: Sonnet 4.6
+**모델**: Sonnet 5
 **도구**: Read, Edit, Write, Glob, Grep, Bash
 **용도**: 다중 파일 리팩토링, 구조 개선.
 
@@ -358,7 +365,7 @@ refactorer는 한 번에 한 가지 패턴만 적용한다. "이름 바꾸기", 
 
 ### 6.7 test-writer — 기존 패턴을 따르는 테스트 작성자
 
-**모델**: Sonnet 4.6
+**모델**: Sonnet 5
 **도구**: Read, Edit, Write, Glob, Grep, Bash
 **용도**: 단위, 통합, E2E 테스트 작성.
 
@@ -368,7 +375,7 @@ test-writer는 시작 시 explorer를 활용해 프로젝트의 기존 테스트
 
 ### 6.8 doc-writer — 사람이 읽을 글의 작성자
 
-**모델**: Sonnet 4.6
+**모델**: Sonnet 5
 **도구**: Read, Edit, Write, Glob, Grep
 **용도**: README, API 문서, ADR, 주석.
 
@@ -393,10 +400,10 @@ explorer의 절대 원칙: **코드 수정 금지** (읽기 전용). 그리고 *
 | architect | Opus 4.8 (effort high) | × | ADR (의사결정 요약) |
 | deep-debugger | Opus 4.8 (effort high) | ✓ | 근본 원인 + 패치 |
 | pr-reviewer | Opus 4.8 (effort xhigh) | × | 우선순위별 리뷰 |
-| implementer | Sonnet 4.6 | ✓ | 변경 파일 + 요약 |
-| refactorer | Sonnet 4.6 | ✓ | 적용 패턴 + 변경 |
-| test-writer | Sonnet 4.6 | ✓ | 테스트 + 엣지 케이스 |
-| doc-writer | Sonnet 4.6 | ✓ | 문서 + 근거 코드 |
+| implementer | Sonnet 5 | ✓ | 변경 파일 + 요약 |
+| refactorer | Sonnet 5 | ✓ | 적용 패턴 + 변경 |
+| test-writer | Sonnet 5 | ✓ | 테스트 + 엣지 케이스 |
+| doc-writer | Sonnet 5 | ✓ | 문서 + 근거 코드 |
 | explorer | Haiku 4.5 | × | 압축된 코드베이스 지도 |
 
 ---
@@ -624,7 +631,7 @@ CLAUDE.md, 시스템 프롬프트, 자주 참조하는 파일은 캐시 친화�
 
 야간 대규모 리팩토링, 대량 문서화, 대량 테스트 생성은 배치 API로 분리하면 추가 50% 절감이다 (응답 24시간 이내 보장). 인터랙티브 세션과 배치 작업의 경계를 의식적으로 설계하라.
 
-배치는 인터랙티브 사용에 적합하지 않지만, "주말에 돌려놓고 월요일 아침에 결과 보기" 식의 작업에는 강력하다. Opus 4.8 배치는 **$2.50 / $12.50**로 떨어져(2026년 5월 기준, 공식 확인) Sonnet 4.6 표준가($3/$15)보다 저렴해진다.
+배치는 인터랙티브 사용에 적합하지 않지만, "주말에 돌려놓고 월요일 아침에 결과 보기" 식의 작업에는 강력하다. Opus 4.8 배치는 **$2.50 / $12.50**로 떨어져(2026년 5월 기준, 공식 확인) Sonnet 5 표준가($3/$15)보다 저렴해진다.
 
 ### 11.6 Fast mode (2026년 5월 신규 레버)
 
@@ -788,7 +795,7 @@ explorer가 원시 grep 출력을 토해내면 컨텍스트 부풀림 회피의 
 
 - 마스터 세션 내에서 `/model` 교체 시 prompt cache가 모델별로 분리되어 무효화되며, 새 모델은 풀 입력을 다시 처리해야 한다. 따라서 마스터는 한 모델로 유지한다.
 - 서브에이전트는 독립된 컨텍스트 윈도우에서 실행되어 마스터 컨텍스트를 오염시키지 않는다.
-- 모델별 비용 비율(2026년 5월 기준): Haiku 4.5 ($1/$5) : Sonnet 4.6 ($3/$15) : Opus 4.8 ($5/$25, 4.7과 동일). Opus 4.7 이후(4.8 포함)는 새 토크나이저로 같은 텍스트가 1.0~1.35배 토큰을 더 사용한다. Opus 4.8 기본 effort는 high(4.7은 xhigh). 모델 ID는 `claude-opus-4-8`.
+- 모델별 비용 비율(2026년 7월 기준): Haiku 4.5 ($1/$5) : Sonnet 5 ($3/$15, 2026-08-31까지 인트로 $2/$10) : Opus 4.8 ($5/$25, 4.7과 동일). 새 토크나이저 세대(Opus 4.7 이후 + Sonnet 5)는 같은 텍스트가 더 많은 토큰이 된다(Opus 4.7+ 최대 1.35×, Sonnet 5는 4.6 대비 ~1.3×). Opus 4.8·Sonnet 5 기본 effort는 high. 모델 ID는 `claude-opus-4-8`·`claude-sonnet-5`.
 - 결정 권한 분배 원칙: 비가역·고난도 → Opus / 일상 실행 → Sonnet / 대량·단순 → Haiku.
 
 ## 3. 완료 기준 (Acceptance Criteria)
@@ -1070,9 +1077,9 @@ CLAUDE.md (없으면 생성, 있으면 별도 섹션 "## Sub-agent Orchestration
 
 **effort**: Claude의 추론 깊이 조절 파라미터. low / medium / high / xhigh / max.
 
-**xhigh**: high와 max 사이의 effort 레벨(API에선 "extra"). Opus 4.7·4.8에서 지원. Claude Code의 Opus 4.7 기본값이었으나, Opus 4.8 기본값은 high로 내려갔다.
+**xhigh**: high와 max 사이의 effort 레벨(API에선 "extra"). Opus 4.7·4.8과 **Sonnet 5**에서 지원(Sonnet 4.6은 미지원). Claude Code의 Opus 4.7 기본값이었으나, Opus 4.8·Sonnet 5 기본값은 high다.
 
-**적응형 추론(adaptive thinking)**: 모델이 단계마다 추론 필요 여부를 자체 판단하는 모드. Opus 4.7 이후(4.8 포함)의 유일한 thinking 모드. 4.8은 같은 effort에서 낭비 thinking 토큰이 더 적다.
+**적응형 추론(adaptive thinking)**: 모델이 단계마다 추론 필요 여부를 자체 판단하는 모드. Opus 4.7 이후(4.8 포함)와 **Sonnet 5**의 유일한 thinking 모드. Sonnet 5는 이 모드가 **기본 ON**이다(Sonnet 4.6은 기본 OFF였음). 4.8은 같은 effort에서 낭비 thinking 토큰이 더 적다.
 
 **프롬프트 캐싱(prompt caching)**: 자주 반복되는 입력을 캐시해 재처리 비용을 줄이는 메커니즘. 캐시 히트는 표준 입력가의 10%. 모델별로 분리됨.
 
@@ -1084,7 +1091,7 @@ CLAUDE.md (없으면 생성, 있으면 별도 섹션 "## Sub-agent Orchestration
 
 **위임 명세 4요소**: 의도 / 제약 / 완료 기준 / 관련 파일. 서브에이전트에 작업을 위임할 때 포함해야 할 항목.
 
-**1M 컨텍스트**: 100만 토큰 컨텍스트 윈도우. Opus 4.8, Opus 4.7, Opus 4.6, Sonnet 4.6에서 표준 가격에 제공.
+**1M 컨텍스트**: 100만 토큰 컨텍스트 윈도우. Opus 4.8, Opus 4.7, Opus 4.6, Sonnet 5, Sonnet 4.6에서 표준 가격에 제공(Haiku 4.5는 200K).
 
 **Batch API**: 비동기 처리 API. 24시간 이내 응답 보장하며 모든 토큰에 50% 할인.
 
@@ -1111,12 +1118,16 @@ CLAUDE.md (없으면 생성, 있으면 별도 섹션 "## Sub-agent Orchestration
 - Claude Code 서브에이전트: https://code.claude.com/docs/en/sub-agents
 - Opus 4.8 What's new: https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8
 - Opus 4.8 마이그레이션 가이드: https://platform.claude.com/docs/en/about-claude/models/migration-guide#migrating-from-claude-opus-47
+- Sonnet 5 What's new: https://platform.claude.com/docs/en/about-claude/models/whats-new-sonnet-5
+- Sonnet 5 소개: https://www.anthropic.com/news/claude-sonnet-5
+- Sonnet 5 마이그레이션 가이드: https://platform.claude.com/docs/en/about-claude/models/migration-guide#migrating-from-claude-sonnet-4-6-to-claude-sonnet-5
 - Opus 4.7 베스트 프랙티스 (Claude Code): https://claude.com/blog/best-practices-for-using-claude-opus-4-7-with-claude-code
 
 ### 이 핸드북의 근거
 
 - 모델 가격은 2026년 4월(4.7)·5월(4.8) Anthropic 공식 가격 문서 기준. 4.8 표준 $5/$25, 배치 $2.50/$12.50, fast mode $10/$50 모두 공식 확인.
 - "Opus 4.7 이후(4.8 포함) 토크나이저 최대 35% 인플레이션"은 Anthropic 공식 가격 문서("Opus 4.7 and later use a new tokenizer ... up to 35% more tokens")와 Simon Willison의 토큰 카운터 실험에 근거.
+- "Sonnet 5 새 토크나이저 ~30% 인플레이션(vs Sonnet 4.6)", "Sonnet 5 표준 $3/$15·인트로 $2/$10(2026-08-31까지)", "기본 effort high·적응형 추론 기본 ON·xhigh 지원·1M 컨텍스트"는 Anthropic 공식 "What's new in Claude Sonnet 5"·모델 개요 문서에 근거.
 - "low Opus 4.7 ≈ medium Opus 4.6"은 Hex CTO의 공개 발언. "low Opus 4.8 ≈ max Opus 4.7"은 Opus 4.8 시스템 카드 SWE-Bench Pro Fig 8.2.A에 근거.
 - "Opus 리드 + Sonnet 워커가 단일 Opus 대비 90.2% 향상"은 Anthropic 공식 멀티에이전트 리서치 시스템 발표.
 - 서브에이전트 frontmatter 필드는 Anthropic 공식 sub-agents 문서에 근거.
@@ -1132,4 +1143,4 @@ CLAUDE.md (없으면 생성, 있으면 별도 섹션 "## Sub-agent Orchestration
 
 **핸드북 끝**
 
-이 핸드북은 2026년 4월 기준으로 작성되고 2026년 5월 Claude Opus 4.8 출시를 반영해 개정되었으며, 2026년 6월 v0.3.0에서 토큰 절감 레버 2종(§11.7·§11.8)과 §14.3 MCP 후보를 편입했다(모델·effort 배정 레이어 갱신, 신기능·운영 원리 편입 — 자세한 변경 이력은 README·CHANGELOG 참조). Claude 모델 라인업·가격·effort 메커니즘은 빠르게 진화하므로, 6개월 이상 지났다면 부록 E의 공식 문서를 다시 확인하라. 핵심 원리(마스터-서브에이전트 분업, 위임 명세 4요소, 모델 매트릭스의 사고 방식)는 모델이 바뀌어도 유효할 가능성이 높다.
+이 핸드북은 2026년 4월 기준으로 작성되고 2026년 5월 Claude Opus 4.8 출시를 반영해 개정되었으며, 2026년 6월 v0.3.0에서 토큰 절감 레버 2종(§11.7·§11.8)과 §14.3 MCP 후보를 편입했다(모델·effort 배정 레이어 갱신, 신기능·운영 원리 편입 — 자세한 변경 이력은 README·CHANGELOG 참조). 2026년 7월 v0.4.0에서 Claude Sonnet 5를 반영했다(Sonnet 티어 모델·가격·토크나이저·effort 레이어 갱신, Opus 티어·아키텍처 불변 — T1 모델 사이클). Claude 모델 라인업·가격·effort 메커니즘은 빠르게 진화하므로, 6개월 이상 지났다면 부록 E의 공식 문서를 다시 확인하라. 핵심 원리(마스터-서브에이전트 분업, 위임 명세 4요소, 모델 매트릭스의 사고 방식)는 모델이 바뀌어도 유효할 가능성이 높다.
