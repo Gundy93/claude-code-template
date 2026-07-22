@@ -4,14 +4,13 @@
 
 Claude Code 프로젝트의 시작점. 신규 프로젝트는 이 템플릿에서 프로필을 골라 복사해 시작한다.
 
-**현재 버전**: v0.4.0
+**현재 버전**: v0.5.0
 
-## 📌 최근 업데이트 (v0.4.0 — 2026년 7월, Claude Sonnet 5 반영)
+## 📌 최근 업데이트 (v0.5.0 — 2026년 7월, Fable 5 재검토 반영)
 
-- **Sonnet 티어 자동 승격**: `model: sonnet` 별칭이 이제 Sonnet 5로 해석 → implementer·refactorer·test-writer·doc-writer가 파일 수정 없이 승격. 에이전트 성능이 Opus 4.8에 근접.
-- **가격**: Sonnet 5 표준 $3/$15, 2026-08-31까지 인트로 $2/$10.
-- **새 토크나이저·effort**: Sonnet 5는 4.6 대비 같은 텍스트가 ~30% 더 많은 토큰(§3.2). 적응형 추론 기본 ON·xhigh 지원(§4).
-- **Opus 티어·아키텍처는 불변**: architect·deep-debugger·pr-reviewer는 Opus 4.8 유지(비가역·보안·최고난도 추론). T1 모델 사이클.
+- **Fable 5 의사결정 가이드 재도입(§5.4)**: 수출통제로 철회했던 가이드를 접근성 회복·**Max 플랜 정식 편입**(2026-07-20, 주간 한도의 50%)에 따라 전면 갱신해 재도입. "effort 먼저, 모델 나중" — Opus 천장에 막힌 최고난도 작업만 Fable로.
+- **8개 에이전트 default 무변경**: Fable 5($10/$50 = Opus 2×)는 수동 에스컬레이션 전용. 보안 리뷰(pr-reviewer)는 안전 분류기 오탐·자동 폴백 때문에 명시적 금지.
+- **마스터 규칙 완화**: 세션 도중 `/model` 교체 금지는 유지하되, Max 플랜에서 최고난도 장기 오케스트레이션이라면 **시작부터** Fable 마스터 선택이 유효해짐.
 
 → 전체 이력: [`CHANGELOG.md`](CHANGELOG.md) · 배경·근거: [`HANDBOOK.md`](HANDBOOK.md) §3~5·§11
 
@@ -79,7 +78,7 @@ cd ~/development/new-project
 
 ## 버전 정책
 
-- VERSION 파일이 단일 진실의 원천 (현재 `v0.4.0`).
+- VERSION 파일이 단일 진실의 원천 (현재 `v0.5.0`).
 - 핸드북·프로필·부트스트랩 프롬프트가 같은 버전을 공유.
 - 큰 변경 시에만 마이너 증가, 호환성 깨질 때만 메이저 증가.
 - 핸드북 자체에 변경이 있으면 템플릿 버전도 함께 올린다.
@@ -95,7 +94,7 @@ claude-code-template/
 ├── README.md                    # 이 파일
 ├── CHANGELOG.md                 # 버전별 변경 이력
 ├── HANDBOOK.md                  # 핸드북 사본 (단일 진실의 원천)
-├── VERSION                      # v0.4.0
+├── VERSION                      # v0.5.0
 ├── docs/
 │   ├── profile-selection.md     # 경량 vs 표준 결정 기준
 │   └── bootstrap-prompts/
