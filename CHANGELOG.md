@@ -33,6 +33,7 @@ v0.3.0에서 접근 제한으로 철회했던 **Fable 5** 가이드를 재검토
 ### Maintenance — 유지관리
 - `VERSION` v0.4.0 → v0.5.0. 7개 버전 스탬프 정합(VERSION·HANDBOOK 첫 줄·README·부트스트랩 ×2·CLAUDE.md ×2). `scripts/sync.sh --check` → OK(`shared/` 무변경 — default 불변이므로 에이전트 원본 불변).
 - `docs/maintenance-guide.md`: §1 아래 **"새 티어 메모" 재도입·확장**(기존 family 위 새 티어 = 경량 추가 원칙 + "접근 정책 유동기엔 [Unreleased], 안정 후 minor 승격" 교훈), §7에 **사이클 3 결과** 추가(철회-재도입 왕복이 "default 무변경·단독 bump 없음" 정책의 회수 가능성을 실증, 재도입 시 이전 문서 사실 명제 전수 재검증 교훈).
+- **리뷰 반영**: 부록 A §2 라인의 v0.4.0 유래 드리프트(Sonnet 괄호구 누락) 정합 — 부록 A와 `docs/bootstrap-prompts/standard.md`의 해당 라인이 다시 byte-identical. `best` 별칭에 공식 근거 라벨 부여, §5.4의 §2.3 인용을 §8.2 단독으로 정밀화.
 
 ---
 
