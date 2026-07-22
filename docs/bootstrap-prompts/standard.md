@@ -14,7 +14,7 @@
 
 - 마스터 세션 내에서 `/model` 교체 시 prompt cache가 모델별로 분리되어 무효화되며, 새 모델은 풀 입력을 다시 처리해야 한다. 따라서 마스터는 한 모델로 유지한다.
 - 서브에이전트는 독립된 컨텍스트 윈도우에서 실행되어 마스터 컨텍스트를 오염시키지 않는다.
-- 모델별 비용 비율(2026년 7월 기준): Haiku 4.5 ($1/$5) : Sonnet 5 ($3/$15, 2026-08-31까지 인트로 $2/$10) : Opus 4.8 ($5/$25, 4.7과 동일). 새 토크나이저 세대(Opus 4.7 이후 + Sonnet 5)는 같은 텍스트가 더 많은 토큰이 된다(Opus 4.7+ 최대 1.35×, Sonnet 5는 4.6 대비 ~1.3×). Opus 4.8·Sonnet 5 기본 effort는 high(Sonnet 5는 적응형 추론 기본 ON, xhigh 지원). 모델 ID는 `claude-opus-4-8`·`claude-sonnet-5`.
+- 모델별 비용 비율(2026년 7월 기준): Haiku 4.5 ($1/$5) : Sonnet 5 ($3/$15, 2026-08-31까지 인트로 $2/$10) : Opus 4.8 ($5/$25, 4.7과 동일). 새 토크나이저 세대(Opus 4.7 이후 + Sonnet 5)는 같은 텍스트가 더 많은 토큰이 된다(Opus 4.7+ 최대 1.35×, Sonnet 5는 4.6 대비 ~1.3×). Opus 4.8·Sonnet 5 기본 effort는 high(Sonnet 5는 적응형 추론 기본 ON, xhigh 지원). 모델 ID는 `claude-opus-4-8`·`claude-sonnet-5`. Opus 위에 **Fable 5**($10/$50, `claude-fable-5`)가 있으나 이 셋업의 default가 아니다 — 어떤 에이전트에도 배정하지 않는다(핸드북 §5.4 수동 에스컬레이션 전용).
 - 결정 권한 분배 원칙: 비가역·고난도 → Opus / 일상 실행 → Sonnet / 대량·단순 → Haiku.
 
 ## 3. 완료 기준 (Acceptance Criteria)
@@ -241,4 +241,4 @@ CLAUDE.md (없으면 생성, 있으면 별도 섹션 "## Sub-agent Orchestration
 
 
 
-# 부트스트랩 버전: v0.4.0
+# 부트스트랩 버전: v0.5.0
