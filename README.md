@@ -4,15 +4,16 @@
 
 Claude Code 프로젝트의 시작점. 신규 프로젝트는 이 템플릿에서 프로필을 골라 복사해 시작한다.
 
-**현재 버전**: v0.5.0
+**현재 버전**: v0.6.0
 
-## 📌 최근 업데이트 (v0.5.0 — 2026년 7월, Fable 5 재검토 반영)
+## 📌 최근 업데이트 (v0.6.0 — 2026년 7월, Claude Opus 5 반영)
 
-- **Fable 5 의사결정 가이드 재도입(§5.4)**: 수출통제로 철회했던 가이드를 접근성 회복·**Max 플랜 정식 편입**(2026-07-20, 주간 한도의 50%)에 따라 전면 갱신해 재도입. "effort 먼저, 모델 나중" — Opus 천장에 막힌 최고난도 작업만 Fable로.
-- **8개 에이전트 default 무변경**: Fable 5($10/$50 = Opus 2×)는 수동 에스컬레이션 전용. 보안 리뷰(pr-reviewer)는 안전 분류기 오탐·자동 폴백 때문에 명시적 금지.
-- **마스터 규칙 완화**: 세션 도중 `/model` 교체 금지는 유지하되, Max 플랜에서 최고난도 장기 오케스트레이션이라면 **시작부터** Fable 마스터 선택이 유효해짐.
+- **Opus 티어 이전**: `model: opus` 별칭이 **Opus 5**로 자동 승격(Claude Code v2.1.219+). **가격($5/$25)과 토크나이저가 4.8과 동일**해 비용 계산과 토큰 예산은 그대로 — 8개 에이전트 파일의 `model`·`effort`도 무변경.
+- **행동 변화 대응 운영 지침 신설**: Opus 5는 자체 검증을 알아서 하고, 위임을 4.8보다 **과하게** 하며, 응답·산출물이 길고 작업 범위를 넓힌다. 이에 맞춰 §9.2 위임 상한과 §12.9~§12.11(과잉검증·장황함·범위 확장) 함정을 추가했다. **검증 지시는 고쳐 쓰지 말고 삭제**가 정답이다.
+- **effort 권장 방향 전환**: 4.7·4.8의 "코딩·에이전틱이면 xhigh에서 시작"이 Opus 5에서는 **"기본값 high에서 시작"**으로 바뀌었다(low·medium을 비용 레버로 적극 활용).
+- **전 문서 정합성 감사**: 캐시 최소 토큰(Opus 5는 512로 절반)·fast mode 지원 범위·토크나이저 인용의 stale 사실을 정정했다.
 
-→ 전체 이력: [`CHANGELOG.md`](CHANGELOG.md) · 배경·근거: [`HANDBOOK.md`](HANDBOOK.md) §3~5·§11
+→ 전체 이력: [`CHANGELOG.md`](CHANGELOG.md) · 배경·근거: [`HANDBOOK.md`](HANDBOOK.md) §3~5·§9·§11~12
 
 ## 무엇이 들어 있는가
 
@@ -41,7 +42,7 @@ profiles/ 디렉토리는 미리 베이크된 부트스트랩 산출물이다. �
 
 ```bash
 cd ~/development/new-project
-# Claude Code의 Opus 4.8 / high 세션을 열고 (어려운 부트스트랩만 xhigh)
+# Claude Code의 Opus 5 / high 세션을 열고 (어려운 부트스트랩만 xhigh)
 # docs/bootstrap-prompts/standard.md (또는 lite.md) 내용을 첫 메시지로 붙여넣기
 ```
 
@@ -78,7 +79,7 @@ cd ~/development/new-project
 
 ## 버전 정책
 
-- VERSION 파일이 단일 진실의 원천 (현재 `v0.5.0`).
+- VERSION 파일이 단일 진실의 원천 (현재 `v0.6.0`).
 - 핸드북·프로필·부트스트랩 프롬프트가 같은 버전을 공유.
 - 큰 변경 시에만 마이너 증가, 호환성 깨질 때만 메이저 증가.
 - 핸드북 자체에 변경이 있으면 템플릿 버전도 함께 올린다.
@@ -94,7 +95,7 @@ claude-code-template/
 ├── README.md                    # 이 파일
 ├── CHANGELOG.md                 # 버전별 변경 이력
 ├── HANDBOOK.md                  # 핸드북 사본 (단일 진실의 원천)
-├── VERSION                      # v0.5.0
+├── VERSION                      # v0.6.0
 ├── docs/
 │   ├── profile-selection.md     # 경량 vs 표준 결정 기준
 │   └── bootstrap-prompts/

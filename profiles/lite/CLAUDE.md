@@ -91,4 +91,4 @@
 
 ---
 
-> 템플릿 v0.5.0 기반. Lite Profile.
+> 템플릿 v0.6.0 기반. Lite Profile.
