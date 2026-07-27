@@ -1,6 +1,6 @@
 # Bootstrap Prompt — Standard Profile (8-Agent)
 
-> 사용법: 새 프로젝트 디렉토리에서 Claude Code의 Opus 4.8 / high 세션을 열고(어려운 부트스트랩만 xhigh), 아래 모든 내용을 첫 메시지로 그대로 붙여넣는다.
+> 사용법: 새 프로젝트 디렉토리에서 Claude Code의 Opus 5 / high 세션을 열고(어려운 부트스트랩만 xhigh), 아래 모든 내용을 첫 메시지로 그대로 붙여넣는다.
 > 핸드북 부록 A를 그대로 옮긴 것이며, 단일 진실의 원천은 `HANDBOOK.md`이다.
 
 
@@ -14,7 +14,7 @@
 
 - 마스터 세션 내에서 `/model` 교체 시 prompt cache가 모델별로 분리되어 무효화되며, 새 모델은 풀 입력을 다시 처리해야 한다. 따라서 마스터는 한 모델로 유지한다.
 - 서브에이전트는 독립된 컨텍스트 윈도우에서 실행되어 마스터 컨텍스트를 오염시키지 않는다.
-- 모델별 비용 비율(2026년 7월 기준): Haiku 4.5 ($1/$5) : Sonnet 5 ($3/$15, 2026-08-31까지 인트로 $2/$10) : Opus 4.8 ($5/$25, 4.7과 동일). 새 토크나이저 세대(Opus 4.7 이후 + Sonnet 5)는 같은 텍스트가 더 많은 토큰이 된다(Opus 4.7+ 최대 1.35×, Sonnet 5는 4.6 대비 ~1.3×). Opus 4.8·Sonnet 5 기본 effort는 high(Sonnet 5는 적응형 추론 기본 ON, xhigh 지원). 모델 ID는 `claude-opus-4-8`·`claude-sonnet-5`. Opus 위에 **Fable 5**($10/$50, `claude-fable-5`)가 있으나 이 셋업의 default가 아니다 — 어떤 에이전트에도 배정하지 않는다(핸드북 §5.4 수동 에스컬레이션 전용).
+- 모델별 비용 비율(2026년 7월 기준): Haiku 4.5 ($1/$5) : Sonnet 5 ($3/$15, 2026-08-31까지 인트로 $2/$10) : Opus 5 ($5/$25, 4.8과 동일). 새 토크나이저 세대(4.7 이후 — Opus 5·4.8·4.7·Sonnet 5)는 같은 텍스트가 약 30% 더 많은 토큰이 된다(Opus 4.6·Sonnet 4.6·Haiku 4.5는 구 토크나이저라 인플레이션 없음). Opus 5·Sonnet 5는 기본 effort high, 적응형 추론 기본 ON, xhigh 지원. 모델 ID는 `claude-opus-5`·`claude-sonnet-5`. Opus 위에 **Fable 5**($10/$50, `claude-fable-5`)가 있으나 이 셋업의 default가 아니다 — 어떤 에이전트에도 배정하지 않는다(핸드북 §5.4 수동 에스컬레이션 전용).
 - 결정 권한 분배 원칙: 비가역·고난도 → Opus / 일상 실행 → Sonnet / 대량·단순 → Haiku.
 
 ## 3. 완료 기준 (Acceptance Criteria)
@@ -71,7 +71,7 @@ tools: Read, Glob, Grep, WebSearch, WebFetch
 본문 필수 요소:
 - 역할: 비가역적 의사결정에 대한 깊은 추론과 구조화.
 - 출력 구조 — ① 의사결정 요약 ② 옵션 비교 (최소 2개) ③ 선택 근거 ④ 위험·전제 ⑤ 후속 액션.
-- frontmatter에 `effort: high` 명시(Opus 4.8+에서 적용). 본문 백스톱 지시: "think at high effort by default; reserve deepest reasoning for irreversible/security-critical work."
+- frontmatter에 `effort: high` 명시(Opus 4.8 이후 적용). 본문 백스톱 지시: "think at high effort by default; reserve deepest reasoning for irreversible/security-critical work."
 - 코드 수정 권한 없음(Edit/Write 도구 비포함). 분석·문서화 산출만 한다.
 
 ### 5.2 deep-debugger — `model: opus`
@@ -86,7 +86,7 @@ tools: Read, Grep, Glob, Bash, Edit
 
 본문 필수 요소:
 - 역할: 단순 스택트레이스로 잡히지 않는 깊은 버그 진단·수정.
-- frontmatter에 `effort: high` 명시(Opus 4.8+에서 적용). 어려우면 호출 시 xhigh.
+- frontmatter에 `effort: high` 명시(Opus 4.8 이후 적용). 어려우면 호출 시 xhigh.
 - 워크플로우 — 가설 수립 → 증거 수집 → 가설 검증 → 최소 수정.
 - 출력 구조 — ① 근본 원인 ② 증거 ③ 수정 패치 ④ 회귀 테스트 제안.
 - 가설이 3회 연속 실패하면 진행을 중단하고 보고할 것 (무한 추론 폭주 방지).
@@ -103,7 +103,7 @@ tools: Read, Grep, Glob, Bash
 
 본문 필수 요소:
 - 역할: 놓치면 비용이 큰 영역(보안, 동시성, 데이터 정합성, 인터페이스 계약, 권한)에 집중.
-- frontmatter에 `effort: xhigh` 명시(Opus 4.8+에서 적용). 놓치면 비용이 큰 영역이라 한 단계 깊게.
+- frontmatter에 `effort: xhigh` 명시(Opus 4.8 이후 적용). 놓치면 비용이 큰 영역이라 한 단계 깊게.
 - 출력 구조 — ① 차단(blocker) 이슈 ② 강력 권고(should-fix) ③ 제안(nice-to-have) ④ 칭찬할 점.
 - 스타일·포맷팅 지적 금지 (도구 영역).
 - 코드 수정 금지 (읽기 전용).
@@ -196,7 +196,7 @@ description: Use to decide whether to delegate a development task to a sub-agent
 
 본문 필수 요소:
 - 위임 결정 트리 — 단순 1-2턴 응답이면 마스터 직접 처리, 다단계·도구 호출 多·결과 격리 필요 시 위임.
-- 작업 유형 → 에이전트 매핑 표 (위 8개 기준, 한국어·영어 키워드 모두 수록).
+- 작업 유형 → 에이전트 매핑 표 (위 8개 기준, 한국어 키워드 수록 — 영어 트리거는 각 에이전트 `description`이 담당).
 - 비용 가이드 — `inherit` 기본값의 위험성, 명시적 `model` 지정의 중요성.
 - 위임 시 명세 4요소 템플릿 — 의도 / 제약 / 완료 기준 / 관련 파일 경로.
 - 라우팅 실패 시그널 — 잘못된 에이전트로 갔을 때 어떻게 회수하는지.
@@ -234,11 +234,11 @@ CLAUDE.md (없으면 생성, 있으면 별도 섹션 "## Sub-agent Orchestration
 
 ## 10. effort
 
-이 작업은 Opus 4.8 기본값인 high로 진행한다(2026년 5월 기준). 다수 파일 생성·검증을 포함한 다단계 작업이지만, 4.8 high가 4.7 xhigh와 비슷한 토큰으로 더 좋은 결과를 내므로 high로 충분하다. 대규모 기존 코드베이스·충돌 많은 `.claude/` 등 어려운 부트스트랩만 xhigh로 올린다.
+이 작업은 Opus 5 기본값인 high로 진행한다. 다수 파일 생성을 포함한 다단계 작업이지만, Opus 5의 공식 권장 시작점이 기본값 high이므로 high로 충분하다. 대규모 기존 코드베이스·충돌 많은 `.claude/` 등 어려운 부트스트랩만 xhigh로 올린다.
 
 
 ---
 
 
 
-# 부트스트랩 버전: v0.5.0
+# 부트스트랩 버전: v0.6.0
