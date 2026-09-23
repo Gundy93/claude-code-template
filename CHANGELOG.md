@@ -2,13 +2,35 @@
 
 이 저장소(`claude-code-template`)의 버전별 변경 기록이다. 형식은 [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/)를 느슨히 따르고 [유의적 버전](https://semver.org/lang/ko/)을 사용한다. 변경의 단일 진실의 원천은 `VERSION`과 `HANDBOOK.md`이며, 이 파일은 그 요약·색인이다.
 
-> 버전 정책: 큰 변경(모델·가격·effort·새 에이전트)은 **minor**, 호환성이 깨지면 **major**. 핸드북 자체에 변경이 있으면 템플릿 버전도 함께 올린다.
+> 버전 정책: 큰 변경(모델·가격·effort·새 에이전트)은 **minor**, 호환성이 깨지면 **major**. 핸드북 자체에 변경이 있으면 템플릿 버전도 함께 올린다. v1.0.0부터의 공개 인터페이스 범위는 README "버전 정책".
 
 ---
 
 ## [Unreleased]
 
 - (현재 비어 있음 — 다음 변경은 여기 누적)
+
+---
+
+## [v1.0.0] — 2026-09-23 — 멀티세션 TDD 플러그인·핸드북 제6부
+
+한 세션 안의 분업(제1~5부)에 더해, **이슈마다 세션을 나눠 동시에 굴리는 운영**을 추가했다. 개념은 핸드북 **제6부**, 구현은 이 저장소 마켓플레이스의 **opt-in 플러그인 `multisession-tdd`**가 맡는다. 한 프로젝트를 2주 동안 운영한 로컬 설정(이슈 47개, 게이트 패킷 241개, 판정 기록 292건)을 일반화한 것이다. lite·standard 프로필과 제1~5부 본문은 바뀌지 않았다.
+
+### Added — 추가
+- **`.claude-plugin/marketplace.json`**: 이 저장소를 마켓플레이스 `claude-code-template`로 등록한다(설치 명령은 README).
+- **`plugins/multisession-tdd/`**
+  - 스킬 4개: `tdd`(마스터), `gate-review`(게이트 검토), `coordinator`(검토 세션 세우기·자원 조정), `pause-resume`(정지·재개 전파). 모두 사용자가 직접 부를 때만 실행된다.
+  - 에이전트 4개: test-writer(opus/high), implementer(sonnet), refactorer(sonnet), pr-reviewer(opus/xhigh).
+  - 훅 3개(exec form): PreToolUse(GREEN 이후 테스트 편집·검토 세션의 타 워크트리 편집 차단), SessionStart(상태 요약), Stop(대기 선언 없는 멈춤 차단 — 위임한 서브에이전트가 백그라운드로 돌 때는 허용).
+  - POSIX sh 스크립트: 워크트리, 상태 머신, 게이트 패킷, 테스트 diff 검사, 저장소 설정. 저장소가 주는 설정값(원격 이름·복사 경로)은 검증한다.
+  - `tests/hooks.test.sh`: 임시 저장소 회귀 테스트 147건(동결 우회 시도·악성 설정 포함).
+- **저장소 설정 `.claude/multisession-tdd.json`**: 검사 명령·테스트 글롭·브랜치 패턴·base·워크트리 루트 등 저장소마다 다른 값. 사용자 설정(`userConfig`)에는 승인·비교 스킬 이름 두 키만 둔다(비우면 채팅 원문과 선택창으로 대체).
+- **HANDBOOK 제6부**(15~20장): 언제 멀티세션인가, 세션 역할과 통신, 게이트 TDD, 이슈별 워크트리와 스택 PR, 공유 자원과 정지·재개, 처음 도입할 때. 부록 D에 용어 5개, 부록 E에 플러그인·훅·스킬·세션 간 메시징 문서.
+
+### Changed — 바뀜
+- **버전 정책**: 1.0의 근거와 공개 인터페이스 범위를 README "버전 정책"에 적었다. 플러그인 `version`은 템플릿 버전과 같다.
+- **README**: 콜아웃, "무엇이 들어 있는가", 플러그인 설치 절, 디렉토리 트리, "6부 + 5개 부록". **README.en**: 개요 불릿과 설치 절.
+- **유지관리 가이드**: 영향 파일 매핑에 플러그인, 버전 스탬프 8곳(`plugin.json` 추가), 검증 A에 `claude plugin validate --strict` ×2와 훅 테스트.
 
 ---
 
