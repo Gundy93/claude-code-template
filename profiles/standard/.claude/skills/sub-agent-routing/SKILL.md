@@ -35,9 +35,9 @@ description: Use to decide whether to delegate a development task to a sub-agent
 
 ## 3. 비용 가이드
 
-- `model: inherit`(frontmatter 기본값) **금지**. 마스터가 Opus면 inherit 에이전트도 Opus로 돌아간다 — Sonnet 대비 약 1.7배, Haiku 대비 5배 비싸진다.
+- `model: inherit`(frontmatter 기본값) **금지**. 마스터가 Opus면 inherit 에이전트도 Opus로 돌아간다 — Sonnet 대비 2배, Haiku 대비 4배 비싸진다(Opus 5.5 기준).
 - 새 에이전트를 추가할 때마다 `model` 필드를 명시했는지 점검.
-- explorer를 거의 모든 비자명 작업의 첫 호출로 사용 (Haiku, 5배 저렴).
+- explorer를 거의 모든 비자명 작업의 첫 호출로 사용 (Haiku, Opus 대비 4배 저렴).
 
 ## 4. 위임 명세 4요소 템플릿
 

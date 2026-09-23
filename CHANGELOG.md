@@ -12,6 +12,40 @@
 
 ---
 
+## [v0.7.0] — 2026-09-23 — Claude Opus 5.5·Fable 5.1 반영
+
+**Claude Opus 5.5**(2026-09-22)와, 3주 전에 나왔으나 반영되지 않았던 **Claude Fable 5.1**(2026-09-01)을 반영한 다섯 번째 모델 유지관리 사이클(T1 + 새 티어 갱신). `model: opus`·`fable` 별칭이 자동 승격하므로 **8개 에이전트 파일은 한 줄도 바뀌지 않았다.** 실질은 네 가지다: Opus 단가 인하와 Sonnet 5 가격 확정, 기본 effort medium·thinking 상시 on, 공식 벤치마크가 뒤집은 Fable 에스컬레이션 전제, 그리고 v0.6.0 이후 바뀐 Claude Code 사실(서브에이전트 모델 변수·상한·메시징)의 갱신이다.
+
+### Changed — 바뀜
+- **Opus 티어 이전**: `model: opus` → **Opus 5.5**(`claude-opus-5-5`, Claude Code **v2.1.280+**; v2.1.219~279는 Opus 5, Foundry는 여전히 4.6). $5/$25 → **$4/$20**, 캐시 읽기 $0.20(입력가의 0.05×), 배치 $2/$10, fast mode $8/$40. "캐시 히트 = 입력가 10%"가 모델별 값이 되어 §1.3·§11.4·부록 D를 고쳤다.
+- **Sonnet 5 가격**: 인트로 $2/$10이 **표준가로 확정**됐다(09-01 예정이던 $3/$15 인상 취소 — 공식). Opus 5.5 : Sonnet 5 = **2×**, 라우팅 스킬 ×2의 `inherit` 배수도 "Sonnet 대비 2배, Haiku 대비 4배"로. 티어 배정은 유지.
+- **effort**: Opus 5.5 디폴트·권장 시작점 **medium**, "medium 5.5 ≥ high 5"(공식), "xhigh·max는 측정한 작업에만". 같은 effort에서 턴당 thinking은 늘어난다. Claude Code는 effort를 모델별로 저장해(v2.1.280) 사용자 설정의 `effortLevel`과 이전 모델 값이 5.5로 넘어오지 않는다(§4.1·§4.3).
+- **Opus 에이전트 effort 배정 유지 + 근거 재서술**(§4.5): architect·deep-debugger high는 유지 근거가 있고, pr-reviewer xhigh는 5.5 가이드에서 벗어남을 명시했다 — 다음 사이클 측정 과제.
+- **부트스트랩**: 프롬프트 안에서는 세션 effort를 바꿀 수 없으므로 **사용법 줄**에 `claude --effort high`를 넣고 §10은 "high 전제"로 바꿨다(부록 A·부트스트랩 ×2·README·§8).
+- **Fable 티어 → Fable 5.1, §5.4 재작성**: Opus 5.5가 공식 벤치마크 9종에서 모두 Fable 5.1 이상이라 "Opus 천장에 막히면 Fable"을 **"자체 eval이 이득을 보여 줄 때만"**으로 바꿨다. **교차검증용 Fable도 권하지 않는다** — 같은 세대 Claude라 오류가 겹칠 수 있고, 교차검증의 효과는 새 컨텍스트·적대적 역할·원천 대조에서 나온다. `fable` 별칭 → 5.1(v2.1.257+).
+- **pr-reviewer 보안 리뷰**(§6.4): Opus 5.5에도 Fable급 사이버 세이프가드가 적용돼 **자기 코드의 버그·취약점 찾기 외의 사이버 작업 대부분이 Opus 4.8로 재라우팅**된다(공식 발표). default `model: opus`는 유지하고 근거를 이에 맞춰 다시 썼다. 폴백은 범주별(사이버 → 4.8, 생물학 → Opus 5).
+- **Opus 5 행동 성향 지침의 지위**(§9.2): 5.5 프롬프팅 문서에는 해당 절이 없고, 출시 발표는 소통·경계 준수 개선을 밝힌다. 지침은 Opus 5 계열에 유지하되 관찰로 확인한다.
+
+### Added — 추가
+- **§4.4 Opus 5.5 breaking change 4건**: `thinking:{disabled}` 400, 강제 `tool_choice` 400, thinking 블록의 모델·대화 묶임, `computer_20251124` 미지원. 도구 호출 사이 텍스트의 thinking 블록화(`display` 설정).
+- **§4.5 서브에이전트 모델 환경 변수**: 모델 해석 순서, `CLAUDE_CODE_SUBAGENT_MODEL`의 의미 변경(v2.1.251, 덮어쓰기 → 기본값), `CLAUDE_CODE_SUBAGENT_MODEL_FORCE`(v2.1.257+). §12.2에 `inherit` 안전망 용도.
+- **§14.1 관찰 사례(익명)**: 테스트가 게이트 뒤 동결되는 TDD 워크플로우에서 test-writer를 opus/high로 올린 사례.
+- **부록 B.0 재작성**, **부록 E**: 출시 발표·Opus 5.5·Fable 5.1·task budgets·refusal·env-vars·agent teams 링크, 근거 절 재정리.
+- **README 디렉토리 트리**에 `README.en.md`·`docs/maintenance-guide.md`.
+
+### Fixed — 정정
+- **세션 총량 상한**(§9.2·§12.8): v0.6.0 당시에는 사실이었다(`CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`, 기본 200, v2.1.212 추가). **v2.1.224(2026-08-07)에서 제거**되어 지금은 상한이 깊이·동시 실행 둘뿐이다.
+- **"서브에이전트끼리 대화하지 못한다"**(§12.8·프로필 `CLAUDE.md` ×2·`shared/claude-md-common.md`): 플랫폼은 `SendMessage`를 가진 이름 붙은 서브에이전트 간 메시지를 허용한다(v2.1.206+). 이 템플릿의 8개 에이전트는 `SendMessage`가 없어 결론은 그대로이므로, "이 셋업은 메시지 도구를 주지 않는다"로 고쳤다.
+- **`CLAUDE_CODE_SUBAGENT_MODEL`의 "모든 서브에이전트 일괄 적용"**(§5.4): v2.1.251부터 frontmatter `model`이 우선한다.
+- **Priority Tier·task budget 지원 범위**: Opus 5.5·Fable 5.1 Priority Tier 미지원, task budget은 Sonnet 5 미지원·Claude Code 미지원.
+- **Fable 플랜 안내 링크 경로 변경**, 공통 참조본·lite `CLAUDE.md`의 위임 상한 문구 누락("하나로 끝낼 수 있으면 하나만 쓴다").
+- **표기 정리**: 절 전반의 "Opus 5" 현재형 서술을 "Opus 5 계열"·"Opus 5.5"로, $5 기준 배수("Haiku는 5분의 1" 등)를 $4 기준으로.
+
+### 기타
+- `profiles/standard/CLAUDE.md` 마스터 권장 모델 Opus 5.5, `docs/maintenance-guide.md` 사이클 5 노트와 감사 규칙 보강(§4-5-2 B1·B4 항목, T1 확인 항목).
+
+---
+
 ## [v0.6.0] — 2026-07-27 — Claude Opus 5 반영
 
 **Claude Opus 5**를 반영한 네 번째 모델 유지관리 사이클(T1). `model: opus` 별칭이 자동 승격되므로 **에이전트 파일은 한 줄도 바뀌지 않았고**, 4.8과 **가격·토크나이저가 동일**해 비용 계산과 토큰 예산도 그대로다. 이번 사이클의 실질은 모델명 치환이 아니라 **모델의 기본 행동 성향 변화에 맞춘 운영 지침 신설**이다 — Opus 5는 자체 검증을 알아서 하고, 서브에이전트 위임을 4.8보다 **과하게** 하며(4.8은 반대로 과소했다), 응답·산출물이 길고 작업 범위를 넓힌다. 아울러 **전 문서 정합성 감사를 처음 수행**해 누적된 stale 사실 6건을 정정했다.
