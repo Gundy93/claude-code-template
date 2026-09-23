@@ -1,0 +1,15 @@
+{
+  "name": "claude-code-template",
+  "owner": { "name": "Gundy93" },
+  "metadata": {
+    "description": "claude-code-template의 opt-in 플러그인 모음"
+  },
+  "plugins": [
+    {
+      "name": "multisession-tdd",
+      "source": "./plugins/multisession-tdd",
+      "description": "이슈별 워크트리 · 마스터/검토 세션 분리 · 게이트 판정 · 훅으로 강제하는 테스트 동결을 갖춘 멀티세션 TDD 오케스트레이션",
+      "category": "development"
+    }
+  ]
+}

@@ -15,6 +15,7 @@
 - `README.md` (현재 버전·정책 문장, 경로 2 모델명, 상단 "최근 업데이트" 콜아웃)
 - `CHANGELOG.md` (버전별 변경 이력 — 매 릴리즈 새 항목 추가)
 - `profiles/standard/.claude/agents/{architect,deep-debugger,pr-reviewer}.md` (신기능 채택 시 — 예: Opus 에이전트의 `effort` 필드)
+- `plugins/multisession-tdd/` (v1.0.0~ — `plugin.json`의 `version`은 매 릴리즈 스탬프 대상, 자세한 것은 §3 끝)
 
 이 사실이 이 가이드의 실용적 토대다.
 
@@ -71,6 +72,8 @@
 
 **주의**: `shared/agents/*.md`를 수정했으면 반드시 `scripts/sync.sh` 실행. `--check`로 drift 검증.
 
+**플러그인(v1.0.0~)**: 모델 사이클(T1~T4)에서 `plugins/multisession-tdd/agents/*.md`는 별칭이라 대개 무변경이다. 다만 effort 배정을 바꾸면 standard 프로필의 같은 역할과 맞춘다. 예외는 test-writer다(플러그인만 opus/high — 핸드북 §14.1). 플러그인이 기대는 Claude Code 기능(훅 입력·exec form, `userConfig`·변수 치환, 세션 간 메시징)이 바뀌면 T5로 보고 `plugins/multisession-tdd/`와 핸드북 제6부를 함께 본다.
+
 ---
 
 ## 4. 업데이트 절차
@@ -87,15 +90,16 @@
 
 3) 버전 결정 (README "버전 정책" 참조)
    - 호환성 깨짐 (필드 제거, 에이전트 삭제 등) → major (v0.1.0 → v1.0.0)
+   - v1.0.0부터: 플러그인 이름·스킬 이름·저장소 설정 스키마·프로필 파일 구조를 깨는 변경 → major
    - 큰 변경 (모델·가격·effort·새 에이전트 추가) → minor (v0.1.0 → v0.2.0)
    - 자잘한 문서 보완 → 다음 minor에 묶음
 
-4) 버전 스탬프 갱신 (7곳) + 변경 이력
-   - VERSION, HANDBOOK.md 첫 줄, README.md, 두 bootstrap-prompts, 두 CLAUDE.md
+4) 버전 스탬프 갱신 (8곳) + 변경 이력
+   - VERSION, HANDBOOK.md 첫 줄, README.md, 두 bootstrap-prompts, 두 CLAUDE.md, plugins/multisession-tdd/.claude-plugin/plugin.json의 "version"(v 없이)
    - 일괄 치환: sed/grep으로 검증
-   - grep -rn "v<NEW>" --include="*.md" --include=VERSION → 7개 파일에서 매칭 확인
+   - 7곳은 v를 붙인 문자열이다: grep -rln "v<NEW>" VERSION HANDBOOK.md README.md docs/bootstrap-prompts profiles/*/CLAUDE.md → 7개 파일(README 등은 한 파일에 여러 번 나온다). 8번째: jq -r .version plugins/multisession-tdd/.claude-plugin/plugin.json → <NEW>(v 없이)
    - CHANGELOG.md에 새 버전 항목 추가 (무엇을·왜) — 변경 이력의 단일 원천. README 상단 "최근 업데이트" 콜아웃과 HANDBOOK 말미 개정 노트도 갱신.
-   - (CHANGELOG.md·이 가이드는 7곳 버전 스탬프 대상이 아님 — CHANGELOG는 누적 추가, 가이드는 자체 스탬프 없음)
+   - (CHANGELOG.md·이 가이드는 8곳 버전 스탬프 대상이 아님 — CHANGELOG는 누적 추가, 가이드는 자체 스탬프 없음)
 
 5) 검증 A — 사이클 검증
    - ./scripts/sync.sh --check  → drift 없음
@@ -105,6 +109,7 @@
    - deep-debugger 본문에 "가설 3회" 명시 (standard)
    - `effort` 필드는 Opus 에이전트(architect/deep-debugger/pr-reviewer)에만, Sonnet/Haiku엔 없음
    - 직전 모델명 잔존 grep (예: 의도치 않은 직전 세대 권장값(예: "Opus 4.8") 0건)
+   - 플러그인(v1.0.0~): claude plugin validate ./plugins/multisession-tdd --strict · claude plugin validate . --strict · sh plugins/multisession-tdd/tests/hooks.test.sh → 실패 0
 
 5-2) 검증 B — 전체 문서 정합성 감사 (릴리즈 전 1회, v0.6.0에서 상설화)
    변경분만 보지 말고 저장소 전체를 여섯 축으로 훑는다. 여기서 나온 정정은 같은 릴리즈에 포함한다(별도 bump 없음).
@@ -136,6 +141,7 @@
 | 검증 강도 라우팅에 4번째 라벨 도입 (예: [Manual]) | minor |
 | HANDBOOK.md typo 수정 1건 | 다음 minor에 묶음 (단독 bump 안 함) |
 | 모델 deprecation에 따라 family alias 디폴트가 자동 변경됐을 뿐 | (Anthropic 측 변경) — 가격·effort 변동이 동반되면 minor |
+| 플러그인 마켓플레이스 신설(v1.0.0) — 호환성은 그대로지만 다른 사람이 의존할 공개 인터페이스가 처음 생김 | **major** ✅ 실제 적용 (0.x → 1.0, README "버전 정책") |
 
 ### 5-1. Worked example — v0.2.0 (Opus 4.8) 실제 사이클
 
@@ -215,6 +221,15 @@ Opus family의 세 번째 T1이자, **놓친 새 티어 갱신(Fable 5.1, 09-01)
 - **"공식 문서의 침묵"은 문서 하나의 침묵일 수 있다.** Opus 5.5 프롬프팅 문서는 Opus 5의 행동 성향 4종에 대해 말이 없지만, 출시 발표는 그중 둘(장황함·경계 이탈)의 개선을 밝혔다. 침묵을 근거로 쓰기 전에 다른 공식 원천을 확인한다.
 - **감사 범위 밖의 오래된 단정도 틀려 있었다.** "서브에이전트끼리 대화 불가"는 `SendMessage`의 서브에이전트 지원(v2.1.206+)으로 v0.6.0 시점에 이미 플랫폼 서술로서는 틀렸는데, 두 번의 감사가 모두 놓쳤다. 이 템플릿의 결론은 "에이전트에 메시지 도구를 주지 않았기 때문"으로 근거를 옮겨 유지했다 — **플랫폼 제약에 기댄 설계 서술은 자기 설정(tools 목록)에 기대는 서술로 바꾸는 편이 오래간다.**
 - **영향 파일**: HANDBOOK 전반(§1·§3~§6·§8·§9.2·§11·§12·§13.2·§14.1·부록 A/B/D/E·머리말·끝맺음), 부트스트랩 ×2, profiles CLAUDE.md ×2(버전·협업 문구, standard는 모델명, lite는 위임 상한 문구), `shared/claude-md-common.md`, 라우팅 SKILL.md ×2, README, CHANGELOG, VERSION, 이 가이드.
+
+### 구조 사이클 — v1.0.0 (멀티세션 플러그인·핸드북 제6부, 2026년 9월)
+
+모델 사이클이 아니라 **배포 형태를 하나 더한** 사이클이다(cadence 표본에서 제외). 개인 로컬 설정을 공개 플러그인으로 일반화했다.
+- **플랫폼 사실이 설계를 정했다.** `userConfig`의 적용 범위와 플러그인 변수가 어디에 들어가는지(부록 E)가 저장소 설정 파일과 스킬 본문 치환이라는 구조를 정했다. 둘 다 계획 단계에서 원문을 받아 읽고서야 보였다.
+- **보안 리뷰가 차단 3건을 찾았다.** 경로 표기(심볼릭 링크·`./`)로 동결 훅 우회, git 오류를 "무변경"으로 읽는 diff 검사, 저장소 설정값의 `git fetch` 옵션 주입. 모두 재현 테스트를 먼저 쓰고 고쳤다. **저장소가 주는 설정은 입력이다** — 훅·스크립트가 읽는 값은 전부 검증 대상이다.
+- **헤드리스 검증의 사각지대.** `-p` 모드는 fork mode가 꺼져 있어 결과가 필요한 서브에이전트를 전경에서 돌린다. 그래서 대화형 세션(기본으로 모두 백그라운드)의 위임과 Stop 훅의 충돌이 보이지 않았다(사실 검증 리뷰가 문서로 찾았다). 실행 검증도 모드별 차이를 확인한다.
+- **스크립트는 실행으로만 검증된다.** 임시 저장소 회귀 테스트를 먼저 통과시키고, 스크립트 사본을 일부러 고장 내 테스트가 실패하는지(뮤테이션 3종) 확인했다. 리뷰에서 나온 결함은 재현 테스트를 먼저 더한 뒤 고쳤다(82건 → 147건). 이어서 `--plugin-dir`로 헤드리스 세션을 띄워 실제 하네스가 exec form 훅으로 테스트 편집을 막는 것을 봤다. 훅 스크립트 단독 테스트만으로는 치환·등록 형식의 오류를 잡지 못한다.
+- **공개본 스크럽은 두 번이다.** 작업 트리 grep과 브랜치 이력(`git log -p`) grep. 원 프로젝트 이름뿐 아니라 도메인 어휘(빌드 도구·포트·규약 이름)도 대상이다.
 
 ### 다음 모델 사이클에서 검토할 것
 - §2 cadence 임계값이 반복 운영에서도 맞는가? (표본 4 — 네 번 다 "4주 이내" 준수. 분기 cadence는 여전히 미검증.)

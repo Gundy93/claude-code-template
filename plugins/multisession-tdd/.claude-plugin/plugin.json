@@ -1,0 +1,30 @@
+{
+  "name": "multisession-tdd",
+  "version": "1.0.0",
+  "description": "이슈별 워크트리 · 마스터/검토 세션 분리 · 게이트 판정 · 훅으로 강제하는 테스트 동결을 갖춘 멀티세션 TDD 오케스트레이션",
+  "author": {
+    "name": "Gundy93"
+  },
+  "homepage": "https://github.com/Gundy93/claude-code-template",
+  "repository": "https://github.com/Gundy93/claude-code-template",
+  "keywords": [
+    "tdd",
+    "multi-session",
+    "worktree",
+    "orchestration"
+  ],
+  "userConfig": {
+    "approval_skill": {
+      "type": "string",
+      "title": "승인 스킬",
+      "description": "외부 반영(PR 발행·코멘트 등) 전에 승인 화면을 여는 스킬 이름. 비우면 게시될 전문을 채팅에 싣고 선택창으로 승인받는다.",
+      "default": ""
+    },
+    "choice_skill": {
+      "type": "string",
+      "title": "선택지 비교 스킬",
+      "description": "트레이드오프가 있는 결정 전에 비교 화면을 여는 스킬 이름. 비우면 선택창 미리보기로 비교한다.",
+      "default": ""
+    }
+  }
+}

@@ -4,16 +4,15 @@
 
 Claude Code 프로젝트의 시작점. 신규 프로젝트는 이 템플릿에서 프로필을 골라 복사해 시작한다.
 
-**현재 버전**: v0.7.0
+**현재 버전**: v1.0.0
 
-## 📌 최근 업데이트 (v0.7.0 — 2026년 9월, Claude Opus 5.5·Fable 5.1 반영)
+## 📌 최근 업데이트 (v1.0.0 — 2026년 9월, 멀티세션 TDD 플러그인·핸드북 제6부)
 
-- **Opus 티어 이전**: `model: opus` 별칭이 **Opus 5.5**로 자동 승격(Claude Code v2.1.280+). $5/$25 → **$4/$20**, 캐시 읽기 $0.20. 8개 에이전트 파일은 무변경. Sonnet 5는 $2/$10이 표준가로 확정돼 Opus 5.5의 절반 — 티어 배정은 그대로다.
-- **기본 effort medium, thinking 상시 on**: 부트스트랩은 `claude --effort high`로 연다. API로 직접 부른다면 breaking change 4건을 확인한다(핸드북 §4.4·부록 B.0).
-- **Fable은 측정 기반으로만**: Opus 5.5가 공식 벤치마크 9종에서 Fable 5.1 이상이라 §5.4를 "자체 eval이 이득을 보여 줄 때만"으로 다시 썼다. `fable` 별칭은 Fable 5.1을 가리킨다.
-- **서브에이전트 사실 갱신**: `CLAUDE_CODE_SUBAGENT_MODEL`은 이제 기본값(일괄 강제는 `_FORCE`), 세션당 스폰 상한은 v2.1.224에서 제거됨, 서브에이전트 간 `SendMessage`가 가능해져 "서로 대화 불가"를 "이 셋업은 메시지 도구를 주지 않는다"로 정정.
+- **opt-in 플러그인 `multisession-tdd`**: 이슈마다 워크트리와 마스터 세션을 두고, 별도의 검토 세션이 게이트마다 판정한다. GATE-1 승인 뒤 테스트는 **훅이 동결**한다. 설치는 아래 "선택: 멀티세션 TDD 플러그인".
+- **핸드북 제6부 멀티세션**(15~20장, 선택): 왜·언제 세션을 나누는가.
+- **lite·standard 프로필과 제1~5부는 무변경**(1.0의 근거는 아래 "버전 정책").
 
-→ 전체 이력: [`CHANGELOG.md`](CHANGELOG.md) · 배경·근거: [`HANDBOOK.md`](HANDBOOK.md) §3~5·§9·§11~12
+→ 전체 이력: [`CHANGELOG.md`](CHANGELOG.md) · 배경·근거: [`HANDBOOK.md`](HANDBOOK.md) 제6부
 
 ## 무엇이 들어 있는가
 
@@ -24,6 +23,7 @@ Claude Code 프로젝트의 시작점. 신규 프로젝트는 이 템플릿에�
 - **`docs/`** — 프로필 선택 기준, 부트스트랩 프롬프트, [유지관리 가이드](docs/maintenance-guide.md) (신모델 출시 시 업데이트 절차).
 - **`shared/`** — 두 프로필 공통 자산 (유지관리용).
 - **`scripts/sync.sh`** — shared/ → profiles/ 동기화 스크립트 (유지관리용).
+- **`plugins/multisession-tdd/`** — 선택 설치하는 멀티세션 TDD 플러그인. 저장소 루트의 `.claude-plugin/marketplace.json`이 이 저장소를 플러그인 마켓플레이스로 만든다.
 
 ## 빠른 시작 — 두 가지 경로
 
@@ -47,6 +47,17 @@ cd ~/development/new-project
 ```
 
 도메인 특화 에이전트 추가 등 변형이 필요할 때 사용. 핸드북 §8 권장 방식.
+
+### 선택: 멀티세션 TDD 플러그인
+
+이슈 여러 개를 세션 단위로 동시에 굴린다면 프로필과 별개로 플러그인을 켠다. Claude Code 세션에서:
+
+```
+/plugin marketplace add Gundy93/claude-code-template
+/plugin install multisession-tdd@claude-code-template
+```
+
+언제 쓸 만한지는 핸드북 제6부, 설정과 빠른 시작은 [`plugins/multisession-tdd/README.md`](plugins/multisession-tdd/README.md).
 
 ## 프로필 선택 기준 (요약)
 
@@ -75,13 +86,14 @@ cd ~/development/new-project
 
 ## 핸드북부터 읽고 싶다면
 
-[`HANDBOOK.md`](HANDBOOK.md) — 5부 + 5개 부록. 시간이 없다면 부록 A의 부트스트랩 프롬프트만 봐도 시작 가능.
+[`HANDBOOK.md`](HANDBOOK.md) — 6부 + 5개 부록(제6부 멀티세션은 선택). 시간이 없다면 부록 A의 부트스트랩 프롬프트만 봐도 시작 가능.
 
 ## 버전 정책
 
-- VERSION 파일이 단일 진실의 원천 (현재 `v0.7.0`).
-- 핸드북·프로필·부트스트랩 프롬프트가 같은 버전을 공유.
+- VERSION 파일이 단일 진실의 원천 (현재 `v1.0.0`).
+- 핸드북·프로필·부트스트랩 프롬프트·플러그인(`plugin.json`의 `version`)이 같은 버전을 공유.
 - 큰 변경 시에만 마이너 증가, 호환성 깨질 때만 메이저 증가.
+- v1.0.0은 호환성을 깬 버전이 아니라 **다른 사람이 의존할 공개 인터페이스가 처음 생긴 버전**이다(유의적 버전에서 0.x는 초기 개발 단계). v1.0.0부터 **플러그인 이름·스킬 이름·저장소 설정 파일 스키마·프로필의 파일 구조**를 공개 인터페이스로 보고, 이것을 깨는 변경은 메이저다.
 - 핸드북 자체에 변경이 있으면 템플릿 버전도 함께 올린다.
 
 ## 변경 이력
@@ -96,7 +108,9 @@ claude-code-template/
 ├── README.en.md                 # 영문 README
 ├── CHANGELOG.md                 # 버전별 변경 이력
 ├── HANDBOOK.md                  # 핸드북 사본 (단일 진실의 원천)
-├── VERSION                      # v0.7.0
+├── VERSION                      # v1.0.0
+├── .claude-plugin/
+│   └── marketplace.json         # 이 저장소를 플러그인 마켓플레이스로 등록
 ├── docs/
 │   ├── profile-selection.md     # 경량 vs 표준 결정 기준
 │   ├── maintenance-guide.md     # 새 모델·핸드북 업데이트 절차
@@ -106,6 +120,8 @@ claude-code-template/
 ├── profiles/
 │   ├── lite/                    # 3-에이전트 경량 셋업 (복사용)
 │   └── standard/                # 8-에이전트 풀셋업 (복사용)
+├── plugins/
+│   └── multisession-tdd/        # 선택 설치 플러그인 (스킬·에이전트·훅·스크립트·테스트)
 ├── shared/                      # 두 프로필 공통 원본 (유지관리용)
 └── scripts/
     └── sync.sh                  # shared/ → profiles/ 동기화 (유지관리용)

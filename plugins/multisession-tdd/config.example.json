@@ -1,0 +1,13 @@
+{
+  "checks": ["npm test", "npm run lint"],
+  "testGlobs": ["**/*.test.ts", "**/*.test.tsx", "**/src/test/**", "**/__mocks__/**"],
+  "branch": "feature/{issue}-{slug}",
+  "base": "origin/main",
+  "worktreeRoot": "../{repo}-wt",
+  "planGlob": ["plans/issue-{issue}*.md"],
+  "planSkill": "",
+  "prSkill": "",
+  "copyOnWorktree": [],
+  "sizeHint": { "files": 10, "lines": 200 },
+  "resources": []
+}

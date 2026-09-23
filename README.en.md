@@ -31,6 +31,10 @@ switching `/model` inside the master (which would split and invalidate the promp
   cost-efficiency matrix by task type, the 8-agent blueprint, daily workflows, cost levers, and
   pitfalls.
 - **`docs/`** — [profile-selection criteria](docs/profile-selection.md), [bootstrap prompts](docs/bootstrap-prompts/), and a [maintenance guide](docs/maintenance-guide.md).
+- **`plugins/multisession-tdd/`** — an optional plugin for multi-session TDD: one worktree and one
+  master session per issue, a separate review session that rules on each gate, and a hook that freezes
+  the tests once the RED gate is approved. This repository doubles as a plugin marketplace
+  (`.claude-plugin/marketplace.json`).
 
 ## Quick start
 
@@ -45,6 +49,19 @@ The `profiles/` directories are pre-baked bootstrap output — copy them and `.c
 immediately, with no Opus bootstrap call needed. (To customize or regenerate from scratch, paste a
 prompt from `docs/bootstrap-prompts/` into a fresh Claude Code session instead.)
 
+### Optional: the multi-session TDD plugin
+
+If you run several issues in parallel, one session each, enable the plugin (independent of the
+profiles). In a Claude Code session:
+
+```
+/plugin marketplace add Gundy93/claude-code-template
+/plugin install multisession-tdd@claude-code-template
+```
+
+When it pays off is covered in Part 6 of the handbook; setup and a quick start are in
+[`plugins/multisession-tdd/README.md`](plugins/multisession-tdd/README.md) (both in Korean).
+
 ## Choosing a profile
 
 Start **lite** for single-cycle, small (≲1,000 LOC or ≤5 core files), UI/integration-heavy, or
@@ -55,6 +72,13 @@ someone else?"* — a Yes to either points to standard.
 
 Full criteria, edge cases, and the lite → standard promotion recipe are in
 [`docs/profile-selection.md`](docs/profile-selection.md).
+
+## Versioning
+
+`VERSION` is the single source of truth, shared by the handbook, profiles, bootstrap prompts and the
+plugin. v1.0.0 did not break compatibility; it is the first release with a public interface others can
+depend on. From v1.0.0, the plugin name, skill names, the repo config schema and the profiles' file
+layout are that interface, and breaking any of them is a major bump.
 
 ## A note on language
 
